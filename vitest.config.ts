@@ -12,6 +12,10 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
+    // Misma site key que en local: los tests de auth dependen del captcha activo
+    env: {
+      VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
+    },
     include: ['src/**/*.spec.ts', 'functions/**/*.spec.ts'],
     coverage: {
       provider: 'v8',
