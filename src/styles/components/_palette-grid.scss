@@ -1,0 +1,14 @@
+// Grilla responsive de cinco colores
+
+@use '../abstracts/tokens' as *;
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: $space-4;
+
+  &__item {
+    display: flex;
+    min-width: 0;
+  }
+}

@@ -1,0 +1,132 @@
+// Listado de paletas guardadas
+
+@use '../abstracts/tokens' as *;
+
+.saved-palettes {
+  display: grid;
+  gap: $space-6;
+
+  &__storage {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+
+    a {
+      color: var(--color-accent);
+    }
+  }
+
+  &__state {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  &__error {
+    color: #dc2626;
+    font-size: 0.85rem;
+  }
+
+  &__empty {
+    display: grid;
+    gap: $space-3;
+    padding: $space-8;
+    border: 1px dashed var(--color-border);
+    border-radius: $radius-lg;
+    text-align: center;
+
+    h2 {
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+    }
+
+    p {
+      color: var(--color-muted);
+      font-size: 0.85rem;
+    }
+  }
+
+  &__cta {
+    justify-self: center;
+    padding: $space-2 $space-4;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: $space-4;
+  }
+}
+
+.saved-card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: $radius-lg;
+  background: var(--color-surface);
+  box-shadow: 0 18px 40px -32px rgb(24 24 27 / 45%);
+
+  &__preview {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    height: 5.5rem;
+  }
+
+  &__swatch {
+    display: block;
+
+    &--base {
+      box-shadow: inset 0 0 0 2px var(--color-accent);
+    }
+  }
+
+  &__body {
+    display: grid;
+    gap: $space-2;
+    padding: $space-4;
+
+    h2 {
+      font-size: 1.05rem;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+    }
+  }
+
+  &__meta,
+  &__date {
+    color: var(--color-muted);
+    font-size: 0.76rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    margin-top: $space-2;
+  }
+
+  &__rename {
+    display: grid;
+    gap: $space-2;
+
+    input {
+      min-height: 2.4rem;
+      padding: $space-2 $space-3;
+      border: 1px solid var(--color-border);
+      border-radius: $radius-sm;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font: inherit;
+      font-size: 0.85rem;
+    }
+  }
+
+  &__rename-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+}

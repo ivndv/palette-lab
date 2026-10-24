@@ -1,0 +1,24 @@
+// Acciones de la paleta
+
+@use '../abstracts/tokens' as *;
+
+.palette-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding-top: $space-2;
+
+  &__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__hint {
+    color: var(--color-muted);
+    font-family: $font-mono;
+    font-size: 0.72rem;
+  }
+}

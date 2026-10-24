@@ -1,0 +1,77 @@
+# Palette Lab
+
+Generador de paletas de color accesible, con contraste WCAG y export listo para producción.
+
+## Qué es
+
+- Aplicación web para crear paletas de cinco colores a partir de un color base.
+- Armonías: análoga, complementaria dividida, tríada, monocromática y aleatoria.
+- Tonos: equilibrado, pastel, vivo, sobrio, oscuro y claro.
+- Contraste WCAG calculado por color, con texto legible elegido automáticamente.
+
+## Herramientas
+
+- Generador: https://palettelab.mgdc.site/generador
+- Interpretación en lenguaje natural: describí una idea como "atardecer en la playa"
+  y la app elige color base, armonía y tono.
+- Bloqueo de colores para conservarlos al regenerar.
+- Deshacer y rehacer.
+- Exportación a CSS, SCSS, Tailwind v4, JSON enriquecido y URL para compartir.
+- Paletas guardadas con cuenta.
+
+## Rutas
+
+- / inicio
+- /generador herramienta completa
+- /mis-paletas paletas guardadas (requiere sesión)
+- /login y /registro acceso
+- /recuperar y /restablecer recuperación de contraseña
+
+## Acceso
+
+- Invitado: generar, exportar y usar la interpretación con IA.
+- Con cuenta: guardar y sincronizar paletas en la nube.
+
+## Stack
+
+Vue 3, TypeScript, Vite, Sass, Pinia, Supabase, FastAPI y Cloudflare Pages.
+
+---
+
+# Palette Lab (English)
+
+An accessible color palette generator with WCAG contrast and production-ready exports.
+
+## What it is
+
+- Web app that builds five-color palettes from a base color.
+- Harmonies: analogous, split complementary, triadic, monochromatic and random.
+- Tones: balanced, pastel, vivid, muted, dark and light.
+- Per-color WCAG contrast with automatically chosen readable text.
+
+## Tools
+
+- Generator: https://palettelab.mgdc.site/generador
+- Natural language interpretation: describe an idea such as "sunset at the beach"
+  and the app picks the base color, harmony and tone.
+- Color locking to keep swatches across regenerations.
+- Undo and redo.
+- Export to CSS, SCSS, Tailwind v4, enriched JSON and a shareable URL.
+- Saved palettes with an account.
+
+## Routes
+
+- / home
+- /generador full tool
+- /mis-paletas saved palettes (requires session)
+- /login and /registro sign in and sign up
+- /recuperar and /restablecer password recovery
+
+## Access
+
+- Guest: generate, export and use AI interpretation.
+- Account: save and sync palettes to the cloud.
+
+## Stack
+
+Vue 3, TypeScript, Vite, Sass, Pinia, Supabase, FastAPI and Cloudflare Pages.

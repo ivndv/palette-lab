@@ -1,0 +1,19 @@
+// Punto de entrada de los estilos
+
+@use 'base/theme';
+@use 'base/reset';
+@use 'layout/shell';
+@use 'layout/footer';
+@use 'components/app-button';
+@use 'components/account-menu';
+@use 'components/ai-prompt';
+@use 'components/palette-toolbar';
+@use 'components/palette-grid';
+@use 'components/color-card';
+@use 'components/palette-actions';
+@use 'components/save-palette';
+@use 'components/export-panel';
+@use 'pages/home';
+@use 'pages/generator';
+@use 'pages/saved-palettes';
+@use 'pages/auth';

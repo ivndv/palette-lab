@@ -1,0 +1,21 @@
+User-agent: GPTBot
+Allow: /
+Disallow: /mis-paletas
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /mis-paletas
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /mis-paletas
+Disallow: /api/
+
+User-agent: *
+Allow: /
+Disallow: /mis-paletas
+Disallow: /api/
+
+Sitemap: https://palettelab.mgdc.site/sitemap.xml

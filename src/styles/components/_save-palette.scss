@@ -1,0 +1,118 @@
+// Panel para guardar la paleta
+
+@use '../abstracts/tokens' as *;
+
+.save-palette {
+  display: grid;
+  gap: $space-3;
+  padding: $space-5;
+  border: 1px solid var(--color-border);
+  border-radius: $radius-lg;
+  background: var(--color-surface);
+  box-shadow: 0 18px 40px -32px rgb(24 24 27 / 45%);
+
+  &__copy {
+    display: grid;
+    gap: $space-1;
+
+    h2 {
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    p {
+      color: var(--color-muted);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__input {
+    flex: 1 1 14rem;
+    min-height: 2.6rem;
+    padding: $space-2 $space-3;
+    border: 1px solid var(--color-border);
+    border-radius: $radius-sm;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font: inherit;
+    font-size: 0.88rem;
+
+    &::placeholder {
+      color: var(--color-muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+
+  &__auth {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__auth-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.4rem;
+    padding: $space-2 $space-4;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:first-child {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: #ffffff;
+    }
+
+    &:hover {
+      border-color: var(--color-accent);
+    }
+  }
+
+  &__error {
+    color: #dc2626;
+    font-size: 0.78rem;
+  }
+
+  &__message {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    color: var(--color-muted);
+    font-size: 0.78rem;
+
+    a {
+      color: var(--color-accent);
+    }
+  }
+
+  &__hint {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    color: var(--color-muted);
+    font-size: 0.76rem;
+
+    a {
+      color: var(--color-accent);
+    }
+  }
+
+  @media (min-width: $breakpoint-md) {
+    padding: $space-6;
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "palette-lab",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "cd ../palette-lab-api && .venv/bin/uvicorn app.main:app --reload --port ${API_PORT:-8010}",
+    "dev:pages": "bun run build && wrangler pages dev dist --ip localhost --port 8788",
+    "dev:full": "concurrently -k -n api,pages -c blue,green \"bun run dev:api\" \"bun run dev:pages\"",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "vue-tsc -b",
+    "check": "biome check .",
+    "lint": "biome check --write .",
+    "format": "biome format --write ."
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.61.0",
+    "@supabase/supabase-js": "^2.118.0",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.12",
+    "@types/node": "^24.19.2",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitest/coverage-v8": "^5.0.5",
+    "@vue/test-utils": "^2.5.1",
+    "@vue/tsconfig": "^0.9.1",
+    "concurrently": "^10.0.6",
+    "happy-dom": "^21.0.4",
+    "sass-embedded": "^1.106.1",
+    "supabase": "^2.122.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13",
+    "wrangler": "^4.152.0"
+  }
+}

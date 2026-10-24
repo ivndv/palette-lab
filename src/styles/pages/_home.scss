@@ -1,0 +1,19 @@
+// Landing
+
+@use '../abstracts/tokens' as *;
+
+.home {
+  display: grid;
+  min-height: calc(100svh - 14rem);
+  place-items: center;
+}
+
+.hero__accent {
+  color: var(--color-accent);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+}

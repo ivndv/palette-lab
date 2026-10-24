@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "palette-lab",
+
+  // Fijada a propósito: un cambio de plataforma no debe alterar el runtime sin avisar.
+  // `wrangler pages dev` la lee de aquí (CLI > config), así que el script ya no repite el flag.
+  "compatibility_date": "2026-10-23"
+
+  // A propósito NO se declara `pages_build_output_dir`.
+  // Al declararlo, este archivo pasa a ser la fuente de verdad del proyecto en producción
+  // y las variables del dashboard (PALETTE_LAB_API_URL, PALETTE_LAB_API_KEY) dejarían de
+  // administrarse desde ahí. El directorio de salida se sigue pasando explícito:
+  // `wrangler pages dev dist`.
+}
