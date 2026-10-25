@@ -15,9 +15,8 @@
   # Fuerza HTTPS
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
-  # TODO: agregar Content-Security-Policy cuando esté definido el dominio
-  # público de Supabase (connect-src). Turnstile necesita
-  # https://challenges.cloudflare.com en script-src, style-src, connect-src y frame-src.
+  # Content Security Policy: Turnstile y Supabase son los únicos orígenes externos
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://spb-palettelab.fluxdv.icu https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
 
 # Assets con hash en el nombre: cache inmutable
 /assets/*
