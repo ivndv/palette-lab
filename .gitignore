@@ -31,3 +31,9 @@ supabase/.temp
 *.njsproj
 *.sln
 *.sw?
+
+
+# codegraph
+/.codegraph/
+
+docs/
