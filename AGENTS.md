@@ -18,7 +18,8 @@ Guía operativa y técnica para agentes de Inteligencia Artificial que colaboren
 ## 2. Antes de Tocar Código
 
 * **Arquitectura hexagonal:** respetar la dirección de dependencias. `src/lib` es dominio puro (sin Vue, sin DOM, sin `fetch`), los efectos externos viven en `src/adapters` detrás de interfaces declaradas en `src/ports`, los casos de uso pequeños en `src/application` y las vistas consumen stores de Pinia. Una vista nunca llama `fetch` directo.
-* **Uso del MCP CodeGraph:** este proyecto **no tiene índice** (no existe `.codegraph/`), así que `codegraph_explore` no puede responder sobre él. Usa las herramientas de búsqueda normales, o habilita el índice con `codegraph init /home/ivan/software-dev/palette-lab` si vas a trabajar de forma intensiva en el código.
+* **Documentación de arquitectura:** lee [`docs/diseno-y-arquitectura.md`](docs/diseno-y-arquitectura.md) antes de cambios estructurales.
+* **Uso del MCP CodeGraph:** el proyecto tiene índice (`.codegraph/`). Antes de búsquedas masivas usa `codegraph_explore` con `projectPath: "/home/ivan/software-dev/palette-lab"`. Para refrescar: `codegraph sync /home/ivan/software-dev/palette-lab`.
 * **Contrato del BFF:** el frontend llama `/api/interpret`. En desarrollo el proxy de Vite hace de BFF; en producción lo hace `functions/api/interpret.ts`. La API key de IA nunca debe llegar al navegador.
 * **Reglas de dominio:** antes de refactorizar `src/lib`, revisa la sección 6.2. Varias garantías (unicidad de HEX, contraste AA, base anclado) están cubiertas por tests y se rompen fácil con un cambio "inocente".
 
