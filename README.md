@@ -35,7 +35,7 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 
 ## Tecnologías Utilizadas
 
-- **Frontend**: Vue 3.5, TypeScript 6, Vite 8, Sass
+- **Frontend**: Vue 3, TypeScript 6, Vite 8, Sass
 - **Estado y Rutas**: Pinia 4, Vue Router 5
 - **Backend / BFF**: Cloudflare Pages Functions
 - **Base de Datos y Auth**: Supabase (PostgreSQL, Auth con RLS por `auth.uid()`)
@@ -47,12 +47,10 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 
 ## Despliegue
 
-La aplicación se encuentra desplegada en **Cloudflare Pages**. Puedes usarla directamente aquí: [palettelab.mgdc.site](https://palettelab.mgdc.site/)
+La aplicación se encuentra desplegada en **Cloudflare Pages**. Puedes usarla directamente aquí: [Palette Lab](https://palettelab.mgdc.site/)
 
 ## Licencia
 
-Licencia de Uso Personal:
+[PolyForm Noncommercial 1.0.0](LICENSE). Uso personal y no comercial; el uso comercial requiere permiso.
 
-Este software es propiedad de **Ivan Cruz**. Se permite el uso de este software solo para fines personales y no comerciales. No se permite la distribución, modificación ni uso comercial de este software sin el consentimiento expreso de **Ivan Cruz**.
-
-Cualquier uso no autorizado puede resultar en acciones legales.
+© 2026 Ivan Cruz
