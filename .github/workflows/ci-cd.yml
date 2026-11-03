@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   lint:
-    name: Lint y formato
+    name: Biome
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,8 +24,8 @@ jobs:
       - name: Setup Bun env
         uses: ./.github/actions/setup
 
-      - name: Biome check
-        run: bun run check
+      - name: Biome CI
+        run: bunx biome ci .
 
   typecheck:
     name: Typecheck
@@ -94,8 +94,7 @@ jobs:
           VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
 
       - name: Deploy a Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist/ --project-name=palette-lab
+        run: bunx wrangler pages deploy dist/ --project-name=palette-lab --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
