@@ -5,6 +5,10 @@
 .saved-palettes {
   display: grid;
   gap: $space-6;
+  // Ocupa el alto del viewport para que el contenido no quede en una banda
+  min-height: calc(100svh - #{$header-height} - 4rem);
+  padding-block-start: $space-8;
+  align-content: start;
 
   &__storage {
     color: var(--color-muted);
@@ -27,7 +31,10 @@
 
   &__empty {
     display: grid;
+    place-content: center;
+    justify-items: center;
     gap: $space-3;
+    min-height: clamp(16rem, 45svh, 26rem);
     padding: $space-8;
     border: 1px dashed var(--color-border);
     border-radius: $radius-lg;
@@ -57,8 +64,8 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-    gap: $space-4;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: $space-5;
   }
 }
 
