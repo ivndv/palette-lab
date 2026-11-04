@@ -2,10 +2,18 @@
 
 @use '../abstracts/tokens' as *;
 
+// Portada: ocupa el viewport completo y centra su contenido bajo el header
 .home {
   display: grid;
-  min-height: calc(100svh - 14rem);
-  place-items: center;
+  align-content: center;
+  margin-block-start: -$header-height;
+  padding-block-start: $header-height;
+  min-height: 100svh;
+  background: radial-gradient(
+    ellipse at top,
+    color-mix(in srgb, var(--color-accent) 8%, transparent),
+    transparent 65%
+  );
 }
 
 .hero__accent {
