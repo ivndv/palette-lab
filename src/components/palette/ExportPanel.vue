@@ -28,6 +28,7 @@ const copied = computed(() => selected.value?.id === props.copiedId)
   <section class="export-panel" aria-labelledby="export-title">
     <div class="export-panel__header">
       <div class="export-panel__copy">
+        <p class="export-panel__eyebrow">04 · Exporta</p>
         <h2 id="export-title">Exportar</h2>
         <p>Lleva la paleta a tu proyecto en el formato que necesites.</p>
       </div>

@@ -107,7 +107,7 @@ function onToneChange(event: Event): void {
     <h2 id="toolbar-title" class="sr-only">Controles de paleta</h2>
 
     <div class="palette-toolbar__field">
-      <label class="palette-toolbar__label" for="base-color">Color base</label>
+      <label class="palette-toolbar__label" for="base-color">01 · Color base</label>
       <div class="palette-toolbar__base-row">
         <input
           id="base-color"
@@ -143,7 +143,7 @@ function onToneChange(event: Event): void {
     </div>
 
     <fieldset class="palette-toolbar__field">
-      <legend class="palette-toolbar__label">Armonía</legend>
+      <legend class="palette-toolbar__label">02 · Armonía</legend>
       <div class="palette-toolbar__modes">
         <AppButton
           v-for="option in HARMONY_MODES"
