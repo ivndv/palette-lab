@@ -11,5 +11,11 @@ import AccountMenu from '@/components/layout/AccountMenu.vue'
     <span class="brand__name">palette lab</span>
   </RouterLink>
 
+  <nav class="header-nav" aria-label="Navegación principal">
+    <RouterLink to="/">Inicio</RouterLink>
+    <RouterLink to="/generador">Generador</RouterLink>
+    <RouterLink to="/mis-paletas">Mis paletas</RouterLink>
+  </nav>
+
   <AccountMenu />
 </template>
