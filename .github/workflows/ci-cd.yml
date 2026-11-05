@@ -16,7 +16,7 @@ permissions:
 jobs:
   lint:
     name: Biome
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -29,7 +29,7 @@ jobs:
 
   typecheck:
     name: Typecheck
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -42,7 +42,7 @@ jobs:
 
   tests:
     name: Tests y cobertura
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -63,7 +63,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -78,7 +78,7 @@ jobs:
     name: Deploy a Cloudflare Pages
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [lint, typecheck, tests, build]
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v7
