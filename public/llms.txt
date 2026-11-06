@@ -11,7 +11,7 @@ Generador de paletas de color accesible, con contraste WCAG y export listo para 
 
 ## Herramientas
 
-- Generador: https://palettelab.mgdc.site/generador
+- Generador: https://palette-lab.liuma.app/generador
 - Interpretación en lenguaje natural: describí una idea como "atardecer en la playa"
   y la app elige color base, armonía y tono.
 - Bloqueo de colores para conservarlos al regenerar.
@@ -51,7 +51,7 @@ An accessible color palette generator with WCAG contrast and production-ready ex
 
 ## Tools
 
-- Generator: https://palettelab.mgdc.site/generador
+- Generator: https://palette-lab.liuma.app/generador
 - Natural language interpretation: describe an idea such as "sunset at the beach"
   and the app picks the base color, harmony and tone.
 - Color locking to keep swatches across regenerations.

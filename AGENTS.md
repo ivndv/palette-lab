@@ -6,7 +6,7 @@
 
 - **Propósito:** generador de paletas que combina armonías cromáticas, tonos, bloqueo de colores, deshacer/rehacer e interpretación en lenguaje natural, con persistencia dual: `localStorage` para el invitado y Supabase (PostgreSQL con RLS) para el usuario autenticado.
 - **Modelo de negocio:** el invitado genera, bloquea y exporta; la cuenta solo es necesaria para guardar y sincronizar paletas.
-- **Dominio en producción:** [https://palettelab.mgdc.site](https://palettelab.mgdc.site)
+- **Dominio en producción:** [https://palette-lab.liuma.app](https://palette-lab.liuma.app)
 - **Repositorio:** el directorio todavía no tiene repositorio Git inicializado. No asumas URLs de clonado ni un remoto configurado.
 
 ## 2. Antes de tocar código
@@ -89,7 +89,7 @@ palette-lab/
 │   └── main.ts
 ├── public/                  → _headers (seguridad, CSP, cache), _redirects (fallback SPA),
 │                              _routes.json (Functions solo /api/*), robots.txt y sitemap.xml
-│                              (apuntan a https://palettelab.mgdc.site), llms.txt (resumen para IA)
+│                              (apuntan a https://palette-lab.liuma.app), llms.txt (resumen para IA)
 ├── supabase/                → config.toml (puertos 54521-54524), migrations/ (saved_palettes con RLS),
 │                              templates/ (emails en español), snippets/
 ├── .github/                 → actions/setup/action.yml, workflows/ci-cd.yml

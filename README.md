@@ -26,7 +26,7 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 
 ## Uso
 
-- **Acceder a la Aplicación**: entra directamente desde cualquier navegador aquí: [Palette Lab](https://palettelab.mgdc.site/).
+- **Acceder a la Aplicación**: entra directamente desde cualquier navegador aquí: [Palette Lab](https://palette-lab.liuma.app/).
 - **Modo invitado o cuenta**: genera, bloquea y exporta sin registrarte; crea una cuenta solo si quieres conservar tus paletas entre dispositivos.
 - **Armar una paleta**: elige un color base, una armonía y un tono; bloquea los que te gusten y regenera el resto.
 - **Describir una idea**: escribe una escena o un concepto en el panel de IA y la app propone base, armonía y tono.
@@ -47,7 +47,7 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 
 ## Despliegue
 
-La aplicación se encuentra desplegada en **Cloudflare Pages**. Puedes usarla directamente aquí: [Palette Lab](https://palettelab.mgdc.site/)
+La aplicación se encuentra desplegada en **Cloudflare Pages**. Puedes usarla directamente aquí: [Palette Lab](https://palette-lab.liuma.app/)
 
 ## Licencia
 

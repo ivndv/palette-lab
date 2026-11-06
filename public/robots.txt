@@ -18,4 +18,4 @@ Allow: /
 Disallow: /mis-paletas
 Disallow: /api/
 
-Sitemap: https://palettelab.mgdc.site/sitemap.xml
+Sitemap: https://palette-lab.liuma.app/sitemap.xml
