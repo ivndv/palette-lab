@@ -42,8 +42,8 @@
   font-size: 0.68rem;
 }
 
-// En escritorio la columna derecha se ordena en dos pisos:
-// paleta y acciones arriba, IA y exportación lado a lado
+// En escritorio la columna derecha se apila en una sola columna:
+// paleta, acciones, IA, exportación y guardado
 @media (min-width: 64rem) {
   .workspace__palette {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -55,6 +55,8 @@
   .workspace__palette > .palette-grid,
   .workspace__palette > .palette-actions,
   .workspace__palette > .generator__shortcuts,
+  .workspace__palette > .ai-prompt,
+  .workspace__palette > .export-panel,
   .workspace__palette > .save-palette {
     grid-column: 1 / -1;
   }
