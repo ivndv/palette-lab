@@ -4,8 +4,8 @@
 
 .palette-toolbar {
   display: grid;
-  gap: $space-5;
-  padding: $space-5;
+  gap: $space-4;
+  padding: $space-4;
   border: 1px solid var(--color-border);
   border-radius: $radius-lg;
   background: var(--color-surface);
@@ -20,13 +20,18 @@
     margin: 0;
   }
 
+  // El legend de un fieldset no respeta el gap del grid
+  &__field > legend {
+    margin-bottom: $space-2;
+  }
+
   &__label {
     padding: 0;
     color: var(--color-muted);
-    font-family: $font-mono;
-    font-size: 0.68rem;
+    font-size: $text-xs;
     font-weight: 600;
     letter-spacing: 0.14em;
+    line-height: 1.3;
     text-transform: uppercase;
   }
 
@@ -34,7 +39,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: $space-3;
+    gap: $space-2;
   }
 
   &__picker {
@@ -62,7 +67,9 @@
   }
 
   &__hex {
-    width: 9.5rem;
+    flex: 1 1 6.5rem;
+    width: auto;
+    min-width: 0;
     min-height: 2.6rem;
     padding: $space-2 $space-3;
     border: 1px solid var(--color-border);
@@ -70,37 +77,48 @@
     background: var(--color-bg);
     color: var(--color-text);
     font-family: $font-mono;
-    font-size: 0.9rem;
+    font-size: $text-base;
     text-transform: lowercase;
   }
 
   &__error {
     color: #dc2626;
-    font-size: 0.78rem;
+    font-size: $text-sm;
   }
 
   &__adapted {
     color: var(--color-muted);
-    font-size: 0.76rem;
+    font-size: $text-sm;
 
     code {
       color: var(--color-accent);
       font-family: $font-mono;
-      font-size: 0.74rem;
+      font-size: $text-sm;
     }
   }
 
   &__select {
     width: 100%;
-    min-height: 2.6rem;
-    padding: $space-2 $space-3;
+    min-height: 2.5rem;
+    padding: 0 $space-3;
+    padding-right: 2.25rem;
     border: 1px solid var(--color-border);
     border-radius: $radius-sm;
-    background: var(--color-bg);
+    background-color: var(--color-bg);
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 18px) calc(50% + 1px),
+      calc(100% - 13px) calc(50% + 1px);
+    background-repeat: no-repeat;
+    background-size: 5px 5px;
     color: var(--color-text);
     cursor: pointer;
+    appearance: none;
     font: inherit;
-    font-size: 0.85rem;
+    font-size: $text-md;
+    line-height: 1.2;
   }
 
   &__modes,
@@ -112,9 +130,16 @@
     gap: $space-2;
   }
 
+  // Botones de armonía compactos para que no dominen la columna
+  &__modes .app-button {
+    min-height: 2rem;
+    padding: $space-1 $space-3;
+    font-size: $text-sm;
+  }
+
   &__hint {
     color: var(--color-muted);
-    font-size: 0.76rem;
+    font-size: $text-sm;
   }
 
   &__chip {
@@ -122,10 +147,12 @@
     padding: $space-1 $space-3;
     border: 1px solid var(--color-border);
     border-radius: 999px;
-    background: transparent;
+    background: var(--color-bg);
     color: var(--color-muted);
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: $text-sm;
+    font-weight: 500;
+    line-height: 1;
     transition:
       background-color 160ms ease,
       border-color 160ms ease,
@@ -133,6 +160,7 @@
 
     &:hover {
       border-color: var(--color-accent);
+      background: var(--color-accent-soft);
       color: var(--color-accent);
     }
 
@@ -145,7 +173,7 @@
 
   &__actions {
     justify-content: space-between;
-    padding-top: $space-2;
+    padding-top: $space-3;
     border-top: 1px solid var(--color-border);
   }
 
@@ -156,6 +184,7 @@
   }
 
   @media (min-width: $breakpoint-md) {
-    padding: $space-6;
+    gap: $space-5;
+    padding: $space-5;
   }
 }

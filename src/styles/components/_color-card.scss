@@ -8,7 +8,7 @@
   flex-direction: column;
   width: 100%;
   min-height: 17rem;
-  padding: $space-5;
+  padding: $space-4;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: $radius-lg;
   box-shadow: var(--shadow-card);
@@ -33,7 +33,7 @@
   }
 
   &__role {
-    font-size: 0.68rem;
+    font-size: $text-xs;
     font-weight: 600;
     letter-spacing: 0.13em;
     opacity: 0.82;
@@ -44,22 +44,21 @@
     padding: 0.15rem 0.45rem;
     border: 1px solid currentColor;
     border-radius: 999px;
-    font-family: $font-mono;
-    font-size: 0.62rem;
+    font-size: $text-2xs;
     line-height: 1.3;
   }
 
   &__hex {
-    margin-top: $space-5;
+    margin-top: $space-4;
     font-family: $font-mono;
-    font-size: 1.35rem;
+    font-size: $text-xl;
     letter-spacing: -0.03em;
   }
 
   &__hsl,
   &__contrast {
     font-family: $font-mono;
-    font-size: 0.7rem;
+    font-size: $text-xs;
     opacity: 0.82;
   }
 
@@ -72,7 +71,7 @@
     flex-wrap: wrap;
     gap: $space-2;
     margin-top: auto;
-    padding-top: $space-5;
+    padding-top: $space-4;
   }
 
   &__action {
@@ -86,7 +85,7 @@
     background: rgb(255 255 255 / 12%);
     color: inherit;
     cursor: pointer;
-    font-size: 0.7rem;
+    font-size: $text-xs;
     font-weight: 600;
     transition: background-color 160ms ease;
 

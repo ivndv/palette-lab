@@ -3,6 +3,15 @@
 $font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 $font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
 
+// Escala tipográfica (rem)
+$text-2xs: 0.625rem; // 10px → badges
+$text-xs: 0.6875rem; // 11px → labels y metadatos
+$text-sm: 0.75rem; // 12px → hints, chips, errores
+$text-md: 0.8125rem; // 13px → controles
+$text-base: 0.875rem; // 14px → inputs y texto base
+$text-lg: 1rem; // 16px → títulos de sección
+$text-xl: 1.375rem; // 22px → HEX destacado
+
 $radius-sm: 0.5rem;
 $radius-md: 0.875rem;
 $radius-lg: 1.25rem;
