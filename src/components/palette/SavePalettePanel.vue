@@ -4,12 +4,16 @@
 import { Save } from '@lucide/vue'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import AppButton from '@/components/ui/AppButton.vue'
+import { SWATCH_COUNT } from '@/lib/palette'
+import { savedErrorCode } from '@/lib/saved-palette'
 import { useAuthStore } from '@/stores/auth'
 import { usePaletteStore } from '@/stores/palette'
 import { useSavedPalettesStore } from '@/stores/saved-palettes'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const paletteStore = usePaletteStore()
 const savedStore = useSavedPalettesStore()
@@ -21,11 +25,17 @@ const saving = ref(false)
 const error = ref<string | null>(null)
 const message = ref<string | null>(null)
 
+function savedErrorMessage(cause: unknown): string {
+  const code = savedErrorCode(cause)
+
+  return code ? t(`saved.errors.${code}`, { count: SWATCH_COUNT }) : t('save.error')
+}
+
 async function onSave(): Promise<void> {
   const value = name.value.trim()
 
   if (!value) {
-    error.value = 'Poné un nombre para la paleta.'
+    error.value = t('save.nameRequired')
     return
   }
 
@@ -44,9 +54,9 @@ async function onSave(): Promise<void> {
     })
 
     name.value = ''
-    message.value = `Guardada como “${saved.name}”.`
+    message.value = t('save.savedAs', { name: saved.name })
   } catch (cause) {
-    error.value = cause instanceof Error ? cause.message : 'No pudimos guardar la paleta.'
+    error.value = savedErrorMessage(cause)
   } finally {
     saving.value = false
   }
@@ -57,21 +67,16 @@ async function onSave(): Promise<void> {
   <section class="save-palette" aria-labelledby="save-palette-title">
     <div class="save-palette__copy">
       <h2 id="save-palette-title">
-        {{ auth.isAuthenticated ? 'Guardar paleta' : 'Guardá tus paletas' }}
+        {{ auth.isAuthenticated ? t('save.titleAuth') : t('save.titleGuest') }}
       </h2>
-      <p v-if="auth.isAuthenticated">
-        Guarda esta combinación para volver a ella cuando quieras.
-      </p>
-      <p v-else>
-        Creá una cuenta o iniciá sesión para guardar tus paletas y acceder a ellas desde
-        cualquier dispositivo.
-      </p>
+      <p v-if="auth.isAuthenticated">{{ t('save.leadAuth') }}</p>
+      <p v-else>{{ t('save.leadGuest') }}</p>
     </div>
 
     <!-- Guardar exige sesión; el invitado ve los accesos -->
     <template v-if="auth.isAuthenticated">
       <form class="save-palette__form" @submit.prevent="onSave">
-        <label class="sr-only" for="save-palette-name">Nombre de la paleta</label>
+        <label class="sr-only" for="save-palette-name">{{ t('save.nameLabel') }}</label>
         <input
           id="save-palette-name"
           v-model="name"
@@ -79,14 +84,14 @@ async function onSave(): Promise<void> {
           type="text"
           maxlength="80"
           autocomplete="off"
-          placeholder="Ej. Atardecer"
+          :placeholder="t('save.placeholder')"
           :disabled="saving"
           :aria-invalid="Boolean(error)"
           :aria-describedby="error ? 'save-palette-error' : undefined"
         />
         <AppButton type="submit" variant="primary" :disabled="saving || !name.trim()">
           <Save :size="16" aria-hidden="true" />
-          {{ saving ? 'Guardando…' : 'Guardar' }}
+          {{ saving ? t('save.saving') : t('save.save') }}
         </AppButton>
       </form>
 
@@ -95,11 +100,11 @@ async function onSave(): Promise<void> {
       </p>
       <p v-else-if="message" class="save-palette__message" aria-live="polite">
         {{ message }}
-        <RouterLink to="/mis-paletas">Ver mis paletas</RouterLink>
+        <RouterLink to="/mis-paletas">{{ t('save.viewSaved') }}</RouterLink>
       </p>
       <p v-else class="save-palette__hint">
-        Se guarda en tu cuenta con el color base, la armonía, el tono y los cinco colores.
-        <RouterLink to="/mis-paletas">Ver mis paletas</RouterLink>
+        {{ t('save.hint') }}
+        <RouterLink to="/mis-paletas">{{ t('save.viewSaved') }}</RouterLink>
       </p>
     </template>
 
@@ -108,13 +113,13 @@ async function onSave(): Promise<void> {
         class="save-palette__auth-link"
         :to="{ path: '/login', query: { redirect: '/generador' } }"
       >
-        Entrar
+        {{ t('save.login') }}
       </RouterLink>
       <RouterLink
         class="save-palette__auth-link"
         :to="{ path: '/registro', query: { redirect: '/generador' } }"
       >
-        Crear cuenta
+        {{ t('save.register') }}
       </RouterLink>
     </div>
   </section>

@@ -106,6 +106,22 @@ describe('onRequestPost', () => {
     expect((await onRequestPost({ request: request({ prompt: 'café' }), env })).status).toBe(502)
   })
 
+  it('conserva el significado de 503 y 504', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(upstream({ error: 'caído' }, 503)))
+
+    const unavailable = await onRequestPost({ request: request({ prompt: 'café' }), env })
+
+    expect(unavailable.status).toBe(503)
+    expect(await unavailable.json()).toMatchObject({ code: 'unavailable' })
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(upstream({ error: 'lento' }, 504)))
+
+    const timeout = await onRequestPost({ request: request({ prompt: 'café' }), env })
+
+    expect(timeout.status).toBe(504)
+    expect(await timeout.json()).toMatchObject({ code: 'timeout' })
+  })
+
   it('devuelve 504 si el fetch se aborta', async () => {
     vi.stubGlobal(
       'fetch',

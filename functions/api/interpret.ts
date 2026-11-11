@@ -37,26 +37,26 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
   try {
     body = await request.json()
   } catch {
-    return json({ error: 'El cuerpo debe ser JSON.' }, 400)
+    return json({ error: 'El cuerpo debe ser JSON.', code: 'body' }, 400)
   }
 
   if (!isRecord(body) || typeof body.prompt !== 'string') {
-    return json({ error: 'Falta la descripción de la paleta.' }, 400)
+    return json({ error: 'Falta la descripción de la paleta.', code: 'missingPrompt' }, 400)
   }
 
   const prompt = body.prompt.trim()
 
   if (!prompt) {
-    return json({ error: 'La descripción no puede estar vacía.' }, 400)
+    return json({ error: 'La descripción no puede estar vacía.', code: 'emptyPrompt' }, 400)
   }
 
   if (prompt.length > 240) {
-    return json({ error: 'La descripción es demasiado larga.' }, 400)
+    return json({ error: 'La descripción es demasiado larga.', code: 'promptTooLong' }, 400)
   }
 
   // 2. Falla temprano si falta configuración: es un fallo nuestro (500), no de la IA
   if (!env.PALETTE_LAB_API_URL) {
-    return json({ error: 'Falta configurar PALETTE_LAB_API_URL.' }, 500)
+    return json({ error: 'Falta configurar PALETTE_LAB_API_URL.', code: 'missingUrl' }, 500)
   }
 
   // 3. Llama al microservicio desde el servidor, nunca desde el navegador: la API key no viaja al cliente.
@@ -81,26 +81,34 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
     const payload: unknown = await response.json().catch(() => null)
 
     // 4. El 429 se propaga con Retry-After para que el cliente sepa cuándo reintentar;
-    //    cualquier otro fallo upstream se traduce a 502
+    //    503/504 conservan su significado; cualquier otro fallo upstream se traduce a 502
     if (!response.ok) {
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After')
 
         return json(
-          { error: 'La IA alcanzó su límite. Inténtalo más tarde.' },
+          { error: 'La IA alcanzó su límite. Inténtalo más tarde.', code: 'rateLimited' },
           429,
           retryAfter ? { 'Retry-After': retryAfter } : undefined,
         )
       }
 
-      return json({ error: 'El servicio de IA no respondió correctamente.' }, 502)
+      if (response.status === 503) {
+        return json({ error: 'No se pudo conectar con la IA.', code: 'unavailable' }, 503)
+      }
+
+      if (response.status === 504) {
+        return json({ error: 'La IA tardó demasiado en responder.', code: 'timeout' }, 504)
+      }
+
+      return json({ error: 'El servicio de IA no respondió correctamente.', code: 'upstream' }, 502)
     }
 
     // 5. Normaliza con el validador del dominio (acepta hex corto, p. ej. #abc)
     const receta = parseInterpretedPalette(payload)
 
     if (!receta) {
-      return json({ error: 'La IA devolvió una receta inválida.' }, 502)
+      return json({ error: 'La IA devolvió una receta inválida.', code: 'invalidRecipe' }, 502)
     }
 
     return json(receta)
@@ -113,6 +121,7 @@ export async function onRequestPost({ request, env }: Context): Promise<Response
         error: timeoutError
           ? 'La IA tardó demasiado en responder.'
           : 'No pudimos conectar con el servicio de IA.',
+        code: timeoutError ? 'timeout' : 'connect',
       },
       timeoutError ? 504 : 502,
     )
