@@ -15,6 +15,8 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 - **Interpretación en lenguaje natural**: una idea como *atardecer en la playa* elige base, armonía y tono, siempre con el mismo resultado.
 - **Export listo para producción**: variables CSS y SCSS, tema de Tailwind v4, JSON con contraste y una URL que reproduce la paleta.
 - **Paletas guardadas**: el invitado genera y exporta; con cuenta se guardan, renombran, duplican y sincronizan.
+- **Bilingüe**: español e inglés desde el menú de cuenta, con la preferencia guardada en el navegador.
+- **Tema claro, oscuro o sistema**: se elige desde el menú de cuenta y se recuerda entre visitas.
 - **Autenticación y accesibilidad**: email, Google y recuperación con Turnstile; navegación por teclado y foco visible.
 
 ## Secciones
@@ -37,6 +39,7 @@ El base queda anclado en el centro de la paleta y los otros cuatro colores se de
 
 - **Frontend**: Vue 3, TypeScript 6, Vite 8, Sass
 - **Estado y Rutas**: Pinia 4, Vue Router 5
+- **i18n**: vue-i18n (español e inglés)
 - **Backend / BFF**: Cloudflare Pages Functions
 - **Base de Datos y Auth**: Supabase (PostgreSQL, Auth con RLS por `auth.uid()`)
 - **Anti-Bot**: Cloudflare Turnstile
