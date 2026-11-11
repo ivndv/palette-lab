@@ -5,18 +5,21 @@
 import { LoaderCircle, UserPlus } from '@lucide/vue'
 // Vue
 import { computed, onMounted, ref, watch } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { isTurnstileEnabled } from '@/adapters/turnstile/turnstile'
 // Componentes
 import AuthLayout from '@/components/auth/AuthLayout.vue'
 import GoogleButton from '@/components/auth/GoogleButton.vue'
 import TurnstileWidget from '@/components/auth/TurnstileWidget.vue'
 // Dominio
 import { resolveRedirect } from '@/lib/auth-links'
-import { isTurnstileEnabled } from '@/lib/turnstile'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
@@ -78,7 +81,7 @@ async function submit(): Promise<void> {
   }
 
   if (password.value !== confirmPassword.value) {
-    localError.value = 'Las contraseñas no coinciden.'
+    localError.value = t('auth.register.mismatch')
     return
   }
 
@@ -113,24 +116,24 @@ async function withGoogle(): Promise<void> {
 <template>
   <AuthLayout
     :icon="UserPlus"
-    title="Creá tu cuenta"
-    subtitle="Guardá tus paletas en la nube y accedé desde cualquier dispositivo."
+    :title="t('auth.register.title')"
+    :subtitle="t('auth.register.subtitle')"
   >
     <template #subtitle>
-      ¿Ya tenés cuenta?
-      <RouterLink :to="loginLink">Entrá</RouterLink>.
+      {{ t('auth.register.already') }}
+      <RouterLink :to="loginLink">{{ t('auth.register.loginLink') }}</RouterLink>.
     </template>
 
     <form class="auth-form" @submit.prevent="submit">
       <div class="auth-field">
-        <label for="register-email">Correo</label>
+        <label for="register-email">{{ t('auth.register.email') }}</label>
         <input
           id="register-email"
           v-model="email"
           type="email"
           autocomplete="email"
           required
-          placeholder="tu@correo.com"
+          :placeholder="t('auth.register.emailPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(errorMessage)"
           :aria-describedby="errorMessage ? 'register-error' : undefined"
@@ -138,7 +141,7 @@ async function withGoogle(): Promise<void> {
       </div>
 
       <div class="auth-field">
-        <label for="register-password">Contraseña</label>
+        <label for="register-password">{{ t('auth.register.password') }}</label>
         <input
           id="register-password"
           v-model="password"
@@ -146,7 +149,7 @@ async function withGoogle(): Promise<void> {
           autocomplete="new-password"
           minlength="6"
           required
-          placeholder="mínimo 6 caracteres"
+          :placeholder="t('auth.register.passwordPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(errorMessage)"
           :aria-describedby="errorMessage ? 'register-error' : undefined"
@@ -154,7 +157,7 @@ async function withGoogle(): Promise<void> {
       </div>
 
       <div class="auth-field">
-        <label for="register-confirm">Confirmar contraseña</label>
+        <label for="register-confirm">{{ t('auth.register.confirm') }}</label>
         <input
           id="register-confirm"
           v-model="confirmPassword"
@@ -162,7 +165,7 @@ async function withGoogle(): Promise<void> {
           autocomplete="new-password"
           minlength="6"
           required
-          placeholder="repetí tu contraseña"
+          :placeholder="t('auth.register.confirmPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(errorMessage)"
           :aria-describedby="errorMessage ? 'register-error' : undefined"
@@ -190,20 +193,20 @@ async function withGoogle(): Promise<void> {
           aria-hidden="true"
         />
         <UserPlus v-else :size="16" aria-hidden="true" />
-        {{ auth.loading ? 'Creando cuenta…' : 'Crear cuenta' }}
+        {{ auth.loading ? t('auth.register.submitting') : t('auth.register.submit') }}
       </button>
     </form>
 
     <div class="auth-separator" aria-hidden="true">
       <span />
-      <em>o</em>
+      <em>{{ t('auth.separator') }}</em>
       <span />
     </div>
 
     <GoogleButton :disabled="auth.loading" @click="withGoogle" />
 
     <template #footer>
-      Al continuar aceptás el uso personal de Palette Lab.
+      {{ t('auth.register.footer') }}
     </template>
   </AuthLayout>
 </template>

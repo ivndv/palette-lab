@@ -2,8 +2,11 @@
 
 // Vue
 import { computed, getCurrentInstance, onBeforeUnmount, ref, watch } from 'vue'
+// Aplicación
+import { PaletteHistory } from '@/application/palette-history'
+import { PalettePersistence } from '@/application/palette-persistence'
 // Adaptadores
-import { localPaletteStorage } from '@/adapters/storage/local-palette-storage'
+import { getContainer } from '@/composition/container'
 // Dominio
 import { type Hex, hslToHex, normalizeHex } from '@/lib/color'
 import {
@@ -18,6 +21,7 @@ import {
   type HarmonyMode,
   isHarmonyMode,
   isPaletteTone,
+  type PaletteState,
   type PaletteTone,
   rebuildPalette,
   regenerateUnlocked,
@@ -60,10 +64,6 @@ interface PaletteSnapshot {
   selectedPresetId: string | null
 }
 
-// Historial acotado y coalescing del picker de color
-const HISTORY_LIMIT = 20
-const HISTORY_COALESCE_MS = 300
-
 // Base aleatoria dentro del perfil del tono activo
 function defaultRandomBase(tone: PaletteTone = DEFAULT_TONE): Hex {
   const random = createSeed()
@@ -99,7 +99,7 @@ function snapshot(
 
 export function usePalette(options: UsePaletteOptions = {}) {
   const persist = options.persist ?? false
-  const storage = options.storage ?? localPaletteStorage
+  const storage = options.storage ?? getContainer().paletteStorage
   const storedState = persist ? storage.load() : null
   const initialSourceBase = normalizeHex(
     storedState?.sourceBase ?? storedState?.base ?? options.base ?? '#4f46e5',
@@ -132,23 +132,21 @@ export function usePalette(options: UsePaletteOptions = {}) {
   )
   const error = ref<string | null>(null)
   const selectedPresetId = ref<string | null>(null)
-  const history = ref<PaletteSnapshot[]>([])
-  const future = ref<PaletteSnapshot[]>([])
+  const canUndo = ref(false)
+  const canRedo = ref(false)
+  const history = new PaletteHistory<PaletteSnapshot>((state) => {
+    canUndo.value = state.canUndo
+    canRedo.value = state.canRedo
+  })
+  const persistence = persist ? new PalettePersistence(storage) : null
   const randomBaseFactory = options.randomBase
-
-  let lastHistoryKind: string | null = null
-  let lastHistoryAt = 0
 
   // Derivados
   const canRegenerate = computed(() => canRegenerateSwatches(swatches.value))
-  const canUndo = computed(() => history.value.length > 0)
-  const canRedo = computed(() => future.value.length > 0)
   const lockedCount = computed(() => countLocked(swatches.value))
   const lockedGeneratedCount = computed(
     () => swatches.value.filter((swatch, index) => index !== BASE_INDEX && swatch.locked).length,
   )
-
-  let saveTimer: ReturnType<typeof setTimeout> | null = null
 
   // Captura y restauración
   function capture(): PaletteSnapshot {
@@ -172,117 +170,49 @@ export function usePalette(options: UsePaletteOptions = {}) {
     error.value = null
   }
 
-  function resetHistoryCoalesce(): void {
-    lastHistoryKind = null
-    lastHistoryAt = 0
-  }
-
   // Historial
   function pushHistory(kind: string): void {
-    const now = Date.now()
-
-    // El picker de color dispara muchos eventos: agrupa una ráfaga en un paso
-    if (
-      kind === 'base' &&
-      lastHistoryKind === 'base' &&
-      now - lastHistoryAt < HISTORY_COALESCE_MS
-    ) {
-      return
-    }
-
-    history.value.push(capture())
-
-    if (history.value.length > HISTORY_LIMIT) {
-      history.value.shift()
-    }
-
-    future.value = []
-    lastHistoryKind = kind
-    lastHistoryAt = now
-  }
-
-  function pushFuture(state: PaletteSnapshot): void {
-    future.value.push(state)
-
-    if (future.value.length > HISTORY_LIMIT) {
-      future.value.shift()
-    }
+    history.push(kind, capture())
   }
 
   function undo(): void {
-    const previous = history.value.pop()
+    const previous = history.undo(capture())
 
-    if (!previous) {
-      return
+    if (previous) {
+      restore(previous)
     }
-
-    pushFuture(capture())
-    restore(previous)
-    resetHistoryCoalesce()
   }
 
   function redo(): void {
-    const next = future.value.pop()
+    const next = history.redo(capture())
 
-    if (!next) {
-      return
+    if (next) {
+      restore(next)
     }
-
-    history.value.push(capture())
-
-    if (history.value.length > HISTORY_LIMIT) {
-      history.value.shift()
-    }
-
-    restore(next)
-    resetHistoryCoalesce()
   }
 
   // Persistencia
-  function persistState(): void {
-    if (!persist) {
-      return
-    }
-
-    storage.save({
+  function currentState(): PaletteState {
+    return {
       version: 3,
       base: base.value,
       sourceBase: sourceBase.value,
       mode: mode.value,
       tone: tone.value,
       swatches: swatches.value,
-    })
-  }
-
-  function scheduleSave(): void {
-    if (!persist) {
-      return
     }
-
-    if (saveTimer) {
-      clearTimeout(saveTimer)
-    }
-
-    saveTimer = setTimeout(() => {
-      saveTimer = null
-      persistState()
-    }, 300)
   }
 
-  if (persist) {
-    watch([base, sourceBase, mode, tone, swatches], scheduleSave, { deep: true })
-    scheduleSave()
-  }
-
-  // Al desmontar se fuerza el guardado pendiente
-  if (getCurrentInstance()) {
-    onBeforeUnmount(() => {
-      if (saveTimer) {
-        clearTimeout(saveTimer)
-        saveTimer = null
-        persistState()
-      }
+  if (persistence) {
+    watch([base, sourceBase, mode, tone, swatches], () => persistence.schedule(currentState()), {
+      deep: true,
     })
+    persistence.schedule(currentState())
+
+    // Al desmontar se fuerza el guardado pendiente
+    if (getCurrentInstance()) {
+      onBeforeUnmount(() => persistence.flush())
+    }
   }
 
   // Cada cambio de opciones avanza la semilla

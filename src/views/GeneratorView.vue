@@ -5,10 +5,12 @@
 import { storeToRefs } from 'pinia'
 // Vue
 import { computed, ref } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { useRoute } from 'vue-router'
 // Adaptadores
-import { httpPaletteInterpreter } from '@/adapters/http/http-palette-interpreter'
+import { download } from '@/adapters/browser/download'
 // Aplicación
 import { interpretPrompt } from '@/application/interpret-prompt'
 // Componentes
@@ -21,16 +23,18 @@ import SavePalettePanel from '@/components/palette/SavePalettePanel.vue'
 // Composables
 import { useClipboard } from '@/composables/useClipboard'
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts'
+import { getContainer } from '@/composition/container'
 // Dominio
 import type { InterpretedPalette } from '@/lib/ai'
 import type { Hex } from '@/lib/color'
-import { createExportFormats, download, type ExportFormat } from '@/lib/export'
+import { createExportFormats, type ExportFormat } from '@/lib/export'
 import type { PaletteState } from '@/lib/palette'
 import { PRESETS } from '@/lib/presets'
 import { parseSharedPalette } from '@/lib/share'
 // Stores
 import { usePaletteStore } from '@/stores/palette'
 
+const { t } = useI18n()
 const paletteStore = usePaletteStore()
 const {
   base,
@@ -73,12 +77,12 @@ const { copiedId, copy } = useClipboard()
 const aiLoading = ref(false)
 const aiError = ref<string | null>(null)
 const aiResult = ref<InterpretedPalette | null>(null)
-const aiExamples = [
-  'café artesanal',
-  'atardecer en la playa',
-  'cyberpunk neón',
-  'minimalista sereno',
-]
+const aiExamples = computed(() => [
+  t('ai.examples.coffee'),
+  t('ai.examples.sunset'),
+  t('ai.examples.cyberpunk'),
+  t('ai.examples.minimal'),
+])
 
 // Estado derivado para exportar
 const paletteState = computed<PaletteState>(() => ({
@@ -107,10 +111,12 @@ const copyAnnouncement = computed(() => {
   const format = exportFormats.value.find((item) => item.id === value)
 
   if (format) {
-    return format.id === 'url' ? 'URL copiada' : `${format.label} copiado`
+    return format.id === 'url'
+      ? t('generator.copiedUrl')
+      : t('generator.copiedFormat', { label: format.label })
   }
 
-  return `Copiado ${value}`
+  return t('generator.copiedHex', { hex: value })
 })
 
 useKeyboardShortcuts({
@@ -134,6 +140,16 @@ function onDownloadFormat(format: ExportFormat): void {
   }
 }
 
+function aiMessage(error: unknown): string {
+  const code = error instanceof Error ? (error as Error & { code?: string }).code : undefined
+
+  if (code) {
+    return t(`ai.errors.${code}`)
+  }
+
+  return error instanceof Error && error.message ? error.message : t('generator.aiGenericError')
+}
+
 // La IA solo elige base, armonía y tono; los colores los genera el dominio
 async function onInterpret(prompt: string): Promise<void> {
   if (aiLoading.value) {
@@ -145,7 +161,7 @@ async function onInterpret(prompt: string): Promise<void> {
   aiResult.value = null
 
   try {
-    const parsed = await interpretPrompt(httpPaletteInterpreter, prompt)
+    const parsed = await interpretPrompt(getContainer().interpreter, prompt)
     const applied = applyInterpretation({
       base: parsed.base,
       mode: parsed.mode,
@@ -154,13 +170,12 @@ async function onInterpret(prompt: string): Promise<void> {
     })
 
     if (!applied) {
-      throw new Error('No pudimos aplicar la interpretación.')
+      throw new Error(t('generator.aiApplyError'))
     }
 
     aiResult.value = parsed
   } catch (error) {
-    aiError.value =
-      error instanceof Error ? error.message : 'No pudimos interpretar la descripción.'
+    aiError.value = aiMessage(error)
   } finally {
     aiLoading.value = false
   }
@@ -170,15 +185,13 @@ async function onInterpret(prompt: string): Promise<void> {
 <template>
   <div class="generator">
     <header class="page-heading">
-      <p class="page-heading__eyebrow">Generador</p>
-      <h1>Tu paleta, paso a paso.</h1>
-      <p>
-        Elige un color base, explora una armonía y bloquea los colores que quieras conservar.
-      </p>
+      <p class="page-heading__eyebrow">{{ t('generator.eyebrow') }}</p>
+      <h1>{{ t('generator.title') }}</h1>
+      <p>{{ t('generator.lead') }}</p>
     </header>
 
     <div class="workspace">
-      <aside class="workspace__controls" aria-label="Controles de la paleta">
+      <aside class="workspace__controls" :aria-label="t('generator.controlsAria')">
         <PaletteToolbar
           :base="sourceBase"
           :applied-base="base"
@@ -203,10 +216,10 @@ async function onInterpret(prompt: string): Promise<void> {
       <section class="workspace__palette" aria-labelledby="palette-title">
         <div class="section-heading">
           <div>
-            <p class="section-heading__eyebrow">03 · Resultado</p>
-            <h2 id="palette-title">Tu paleta</h2>
+            <p class="section-heading__eyebrow">{{ t('generator.resultEyebrow') }}</p>
+            <h2 id="palette-title">{{ t('generator.resultTitle') }}</h2>
           </div>
-          <p class="section-heading__hint">Bloquea los colores que quieras conservar.</p>
+          <p class="section-heading__hint">{{ t('generator.resultHint') }}</p>
         </div>
 
         <PaletteGrid
@@ -227,9 +240,7 @@ async function onInterpret(prompt: string): Promise<void> {
           @unlock-all="unlockAll"
         />
 
-        <p id="atajos" class="generator__shortcuts">
-          Espacio: regenerar · U: deshacer · R: aleatorio
-        </p>
+        <p id="atajos" class="generator__shortcuts">{{ t('generator.shortcuts') }}</p>
 
         <!-- La IA vive entre la paleta y la exportación -->
         <AiPrompt

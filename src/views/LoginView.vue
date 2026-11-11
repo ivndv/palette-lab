@@ -5,18 +5,21 @@
 import { LoaderCircle, LogIn, Palette } from '@lucide/vue'
 // Vue
 import { computed, onMounted, ref, watch } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { isTurnstileEnabled } from '@/adapters/turnstile/turnstile'
 // Componentes
 import AuthLayout from '@/components/auth/AuthLayout.vue'
 import GoogleButton from '@/components/auth/GoogleButton.vue'
 import TurnstileWidget from '@/components/auth/TurnstileWidget.vue'
 // Dominio
 import { resolveRedirect } from '@/lib/auth-links'
-import { isTurnstileEnabled } from '@/lib/turnstile'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
@@ -112,24 +115,24 @@ async function withGoogle(): Promise<void> {
 <template>
   <AuthLayout
     :icon="Palette"
-    title="Bienvenido de nuevo"
-    subtitle="Entrá para guardar tus paletas y volver a ellas cuando quieras."
+    :title="t('auth.login.title')"
+    :subtitle="t('auth.login.subtitle')"
   >
     <template #subtitle>
-      ¿Primera vez?
-      <RouterLink :to="registerLink">Creá tu cuenta</RouterLink>.
+      {{ t('auth.login.firstTime') }}
+      <RouterLink :to="registerLink">{{ t('auth.login.registerLink') }}</RouterLink>.
     </template>
 
     <form class="auth-form" @submit.prevent="submit">
       <div class="auth-field">
-        <label for="login-email">Correo</label>
+        <label for="login-email">{{ t('auth.login.email') }}</label>
         <input
           id="login-email"
           v-model="email"
           type="email"
           autocomplete="email"
           required
-          placeholder="tu@correo.com"
+          :placeholder="t('auth.login.emailPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(auth.error)"
           :aria-describedby="auth.error ? 'login-error' : undefined"
@@ -137,7 +140,7 @@ async function withGoogle(): Promise<void> {
       </div>
 
       <div class="auth-field">
-        <label for="login-password">Contraseña</label>
+        <label for="login-password">{{ t('auth.login.password') }}</label>
         <input
           id="login-password"
           v-model="password"
@@ -145,7 +148,7 @@ async function withGoogle(): Promise<void> {
           autocomplete="current-password"
           minlength="6"
           required
-          placeholder="mínimo 6 caracteres"
+          :placeholder="t('auth.login.passwordPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(auth.error)"
           :aria-describedby="auth.error ? 'login-error' : undefined"
@@ -154,7 +157,7 @@ async function withGoogle(): Promise<void> {
 
       <p class="auth-link-row">
         <RouterLink class="auth-link" to="/recuperar">
-          ¿Olvidaste tu contraseña?
+          {{ t('auth.login.forgot') }}
         </RouterLink>
       </p>
 
@@ -169,7 +172,7 @@ async function withGoogle(): Promise<void> {
           :disabled="!canResend"
           @click="resend"
         >
-          Reenviar email de confirmación
+          {{ t('auth.login.resend') }}
         </button>
       </p>
       <p v-else-if="auth.info" class="auth-alert auth-alert--info" aria-live="polite">
@@ -188,20 +191,20 @@ async function withGoogle(): Promise<void> {
           aria-hidden="true"
         />
         <LogIn v-else :size="16" aria-hidden="true" />
-        {{ auth.loading ? 'Entrando…' : 'Entrar' }}
+        {{ auth.loading ? t('auth.login.submitting') : t('auth.login.submit') }}
       </button>
     </form>
 
     <div class="auth-separator" aria-hidden="true">
       <span />
-      <em>o</em>
+      <em>{{ t('auth.separator') }}</em>
       <span />
     </div>
 
     <GoogleButton :disabled="auth.loading" @click="withGoogle" />
 
     <template #footer>
-      Al continuar aceptás el uso personal de Palette Lab.
+      {{ t('auth.login.footer') }}
     </template>
   </AuthLayout>
 </template>

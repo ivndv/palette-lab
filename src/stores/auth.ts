@@ -1,26 +1,30 @@
 // Estado de autenticación y acciones de la cuenta
 
-import type { Session, User } from '@supabase/supabase-js'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { supabaseAuthGateway } from '@/adapters/supabase/supabase-auth-gateway'
-import { authErrorMessage, needsEmailConfirmation } from '@/lib/auth-errors'
-import { authRedirect } from '@/lib/auth-links'
+import { authRedirect } from '@/adapters/browser/auth-redirect'
+import { getContainer } from '@/composition/container'
+import { i18n } from '@/i18n'
+import type { Sesion, Usuario } from '@/lib/auth'
+import { authErrorKey, needsEmailConfirmation } from '@/lib/auth-errors'
 import type { AuthGateway } from '@/ports/auth-gateway'
 
-let activeGateway: AuthGateway = supabaseAuthGateway
+let activeGateway: AuthGateway = getContainer().auth
+const defaultGateway: AuthGateway = activeGateway
 
 export function setAuthGateway(gateway: AuthGateway): void {
   activeGateway = gateway
+  getContainer().auth = gateway
 }
 
 export function resetAuthGateway(): void {
-  activeGateway = supabaseAuthGateway
+  activeGateway = defaultGateway
+  getContainer().auth = defaultGateway
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const session = ref<Session | null>(null)
-  const user = ref<User | null>(null)
+  const session = ref<Sesion | null>(null)
+  const user = ref<Usuario | null>(null)
   const loading = ref(false)
   const initialized = ref(false)
   const error = ref<string | null>(null)
@@ -33,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
   const userEmail = computed(() => user.value?.email ?? '')
   const userInitial = computed(() => (userEmail.value[0] ?? '?').toUpperCase())
 
-  function setSession(next: Session | null): void {
+  function setSession(next: Sesion | null): void {
     session.value = next
     user.value = next?.user ?? null
   }
@@ -57,7 +61,7 @@ export const useAuthStore = defineStore('auth', () => {
       setSession(await activeGateway.getSession())
       unsubscribe = activeGateway.onChange(setSession)
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
     } finally {
       initialized.value = true
       loading.value = false
@@ -74,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return Boolean(session.value)
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
       emailConfirmationRequired.value = needsEmailConfirmation(cause)
 
       return false
@@ -95,12 +99,12 @@ export const useAuthStore = defineStore('auth', () => {
       setSession(await activeGateway.getSession())
 
       if (!session.value) {
-        info.value = 'Revisá tu email para confirmar la cuenta.'
+        info.value = i18n.global.t('auth.info.signup')
       }
 
       return Boolean(session.value ?? created)
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
 
       return false
     } finally {
@@ -114,11 +118,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await activeGateway.resendConfirmation(email, authRedirect('/confirmar'), captchaToken)
       emailConfirmationRequired.value = false
-      info.value = 'Te enviamos un email nuevo para confirmar la cuenta.'
+      info.value = i18n.global.t('auth.info.resend')
 
       return true
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
 
       return false
     } finally {
@@ -135,7 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
 
       return true
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
 
       return false
     } finally {
@@ -149,11 +153,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       await activeGateway.requestPasswordReset(email, authRedirect('/restablecer'), captchaToken)
-      info.value = 'Si el email existe, te mandamos un enlace para restablecer la contraseña.'
+      info.value = i18n.global.t('auth.info.reset')
 
       return true
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
 
       return false
     } finally {
@@ -166,11 +170,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       await activeGateway.updatePassword(password)
-      info.value = 'Contraseña actualizada.'
+      info.value = i18n.global.t('auth.info.updated')
 
       return true
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
 
       return false
     } finally {
@@ -187,7 +191,7 @@ export const useAuthStore = defineStore('auth', () => {
       setSession(null)
       info.value = null
     } catch (cause) {
-      error.value = authErrorMessage(cause)
+      error.value = i18n.global.t(authErrorKey(cause))
     } finally {
       loading.value = false
     }

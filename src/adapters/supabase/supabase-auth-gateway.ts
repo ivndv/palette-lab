@@ -1,6 +1,7 @@
 // Adaptador de auth sobre Supabase
 
 import type { Session, User } from '@supabase/supabase-js'
+import type { Sesion, Usuario } from '@/lib/auth'
 import type { AuthGateway, SignUpOptions } from '@/ports/auth-gateway'
 import { supabase } from './client'
 
@@ -13,21 +14,34 @@ function client() {
   return supabase
 }
 
+// Traduce el modelo de Supabase al dominio
+function toUsuario(user: User): Usuario {
+  return { id: user.id, email: user.email ?? '' }
+}
+
+function toSesion(session: Session | null): Sesion | null {
+  if (!session?.user) {
+    return null
+  }
+
+  return { user: toUsuario(session.user), accessToken: session.access_token }
+}
+
 export class SupabaseAuthGateway implements AuthGateway {
-  async getSession(): Promise<Session | null> {
+  async getSession(): Promise<Sesion | null> {
     const { data, error } = await client().auth.getSession()
 
     if (error) {
       throw error
     }
 
-    return data.session
+    return toSesion(data.session)
   }
 
   // Devuelve la función para desuscribirse
-  onChange(callback: (session: Session | null) => void): () => void {
+  onChange(callback: (session: Sesion | null) => void): () => void {
     const { data } = client().auth.onAuthStateChange((_event, session) => {
-      callback(session)
+      callback(toSesion(session))
     })
 
     return () => {
@@ -35,7 +49,7 @@ export class SupabaseAuthGateway implements AuthGateway {
     }
   }
 
-  async signIn(email: string, password: string, captchaToken?: string): Promise<User> {
+  async signIn(email: string, password: string, captchaToken?: string): Promise<Usuario> {
     const { data, error } = await client().auth.signInWithPassword({
       email,
       password,
@@ -46,10 +60,14 @@ export class SupabaseAuthGateway implements AuthGateway {
       throw error
     }
 
-    return data.user
+    return toUsuario(data.user)
   }
 
-  async signUp(email: string, password: string, options: SignUpOptions = {}): Promise<User | null> {
+  async signUp(
+    email: string,
+    password: string,
+    options: SignUpOptions = {},
+  ): Promise<Usuario | null> {
     const { data, error } = await client().auth.signUp({
       email,
       password,
@@ -63,7 +81,7 @@ export class SupabaseAuthGateway implements AuthGateway {
       throw error
     }
 
-    return data.user
+    return data.user ? toUsuario(data.user) : null
   }
 
   // Redirige al proveedor; el retorno lo resuelve detectSessionInUrl

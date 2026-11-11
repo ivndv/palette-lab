@@ -1,9 +1,8 @@
 // Pruebas de los formatos de exportación
 
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   createExportFormats,
-  download,
   formatSwatchText,
   toCssVariables,
   toEnrichedJson,
@@ -14,10 +13,6 @@ import {
 import { createPaletteState } from './palette'
 
 const state = createPaletteState('#4f46e5', 'analogous', 42)
-
-afterEach(() => {
-  vi.unstubAllGlobals()
-})
 
 describe('export formats', () => {
   it('genera variables CSS con alias del base', () => {
@@ -75,27 +70,5 @@ describe('export formats', () => {
   it('mantiene el JSON crudo y usa un prefijo seguro', () => {
     expect(toJson(state)).toContain('"version": 3')
     expect(toCssVariables(state.swatches, '  ')).toContain('--color-1:')
-  })
-
-  it('no falla al descargar si no hay createObjectURL', () => {
-    vi.stubGlobal('URL', { createObjectURL: undefined })
-
-    expect(() => download('x.txt', 'hola', 'text/plain')).not.toThrow()
-  })
-
-  it('crea y revoca el blob al descargar', () => {
-    const createObjectURL = vi.fn(() => 'blob:test')
-    const revokeObjectURL = vi.fn()
-    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
-
-    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL })
-
-    download('palette.css', 'body {}', 'text/css')
-
-    expect(createObjectURL).toHaveBeenCalledTimes(1)
-    expect(click).toHaveBeenCalledTimes(1)
-    expect(revokeObjectURL).toHaveBeenCalledWith('blob:test')
-
-    click.mockRestore()
   })
 })

@@ -15,7 +15,7 @@ const state = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('@/lib/turnstile', () => ({
+vi.mock('@/adapters/turnstile/turnstile', () => ({
   isTurnstileEnabled: () => state.enabled,
   getTurnstileSiteKey: () => 'site-key',
   loadTurnstile: () =>

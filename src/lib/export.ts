@@ -138,20 +138,3 @@ export function formatSwatchText(swatch: Swatch): { text: Hex; contrast: number 
 }
 
 // Descarga un archivo desde el navegador; falla en silencio si no hay soporte
-export function download(filename: string, content: string, mime: string): void {
-  if (typeof URL.createObjectURL !== 'function') {
-    return
-  }
-
-  const blob = new Blob([content], { type: mime })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-
-  anchor.href = url
-  anchor.download = filename
-
-  document.body.appendChild(anchor)
-  anchor.click()
-  anchor.remove()
-  URL.revokeObjectURL(url)
-}

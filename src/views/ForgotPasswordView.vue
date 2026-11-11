@@ -5,16 +5,19 @@
 import { KeyRound, LoaderCircle, Mail } from '@lucide/vue'
 // Vue
 import { computed, ref } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink } from 'vue-router'
+// Dominio
+import { isTurnstileEnabled } from '@/adapters/turnstile/turnstile'
 // Componentes
 import AuthLayout from '@/components/auth/AuthLayout.vue'
 import TurnstileWidget from '@/components/auth/TurnstileWidget.vue'
-// Dominio
-import { isTurnstileEnabled } from '@/lib/turnstile'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 
 // Estado del formulario
@@ -52,19 +55,19 @@ async function submit(): Promise<void> {
 <template>
   <AuthLayout
     :icon="KeyRound"
-    title="Recuperá tu acceso"
-    subtitle="Te enviamos un enlace para restablecer tu contraseña."
+    :title="t('auth.forgot.title')"
+    :subtitle="t('auth.forgot.subtitle')"
   >
     <form class="auth-form" @submit.prevent="submit">
       <div class="auth-field">
-        <label for="recover-email">Correo</label>
+        <label for="recover-email">{{ t('auth.forgot.email') }}</label>
         <input
           id="recover-email"
           v-model="email"
           type="email"
           autocomplete="email"
           required
-          placeholder="tu@correo.com"
+          :placeholder="t('auth.forgot.emailPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(auth.error)"
           :aria-describedby="auth.error ? 'recover-error' : undefined"
@@ -92,12 +95,12 @@ async function submit(): Promise<void> {
           aria-hidden="true"
         />
         <Mail v-else :size="16" aria-hidden="true" />
-        {{ auth.loading ? 'Enviando…' : 'Enviar enlace' }}
+        {{ auth.loading ? t('auth.forgot.submitting') : t('auth.forgot.submit') }}
       </button>
     </form>
 
     <p class="auth-footnote">
-      <RouterLink class="auth-link" to="/login">Volver a entrar</RouterLink>
+      <RouterLink class="auth-link" to="/login">{{ t('auth.forgot.back') }}</RouterLink>
     </p>
   </AuthLayout>
 </template>

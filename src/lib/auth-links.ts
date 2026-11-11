@@ -11,8 +11,3 @@ export function isSafeRedirect(value: unknown): value is string {
 export function resolveRedirect(value: unknown, fallback = DEFAULT_REDIRECT): string {
   return isSafeRedirect(value) ? value : fallback
 }
-
-// Convierte una ruta en URL absoluta sobre el origen actual
-export function authRedirect(path: string): string {
-  return `${window.location.origin}${path}`
-}

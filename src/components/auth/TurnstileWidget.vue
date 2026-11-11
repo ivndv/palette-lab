@@ -2,12 +2,15 @@
 // Widget de Cloudflare Turnstile con render explícito
 
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   getTurnstileSiteKey,
   isTurnstileEnabled,
   loadTurnstile,
   type TurnstileApi,
-} from '@/lib/turnstile'
+} from '@/adapters/turnstile/turnstile'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   token: [value: string]
@@ -84,10 +87,10 @@ defineExpose({ reset })
   <div v-if="enabled" class="turnstile">
     <div ref="container" class="turnstile__widget" />
     <p v-if="status === 'error'" class="turnstile__hint" role="status">
-      No pudimos cargar la verificación. Recargá la página.
+      {{ t('auth.turnstileError') }}
     </p>
   </div>
   <p v-else-if="dev" class="turnstile__hint" role="status">
-    Falta configurar VITE_TURNSTILE_SITE_KEY.
+    {{ t('auth.turnstileMissing') }}
   </p>
 </template>

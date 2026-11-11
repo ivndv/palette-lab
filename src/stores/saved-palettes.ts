@@ -2,15 +2,17 @@
 
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { localSavedPaletteRepository } from '@/adapters/storage/local-saved-palette-repository'
-import { supabaseSavedPaletteRepository } from '@/adapters/supabase/supabase-saved-palette-repository'
 import {
-  createSavedPalette,
-  duplicateSavedPalette,
-  renameSavedPalette,
-  type SavedPalette,
-  type SavedPaletteInput,
-} from '@/lib/saved-palette'
+  createPalette,
+  duplicatePalette,
+  removePalette,
+  renamePalette,
+} from '@/application/saved-palettes'
+import { syncSavedPalettes } from '@/application/sync-saved-palettes'
+import { getContainer } from '@/composition/container'
+import { i18n } from '@/i18n'
+import { SWATCH_COUNT } from '@/lib/palette'
+import { type SavedPalette, type SavedPaletteInput, savedErrorCode } from '@/lib/saved-palette'
 import type { SavedPaletteRepository } from '@/ports/saved-palette-repository'
 import { useAuthStore } from '@/stores/auth'
 
@@ -29,8 +31,17 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
 
   const count = computed(() => palettes.value.length)
   const repository = computed<SavedPaletteRepository>(
-    () => repositoryOverride ?? supabaseSavedPaletteRepository,
+    () => repositoryOverride ?? getContainer().remoteSavedPalettes,
   )
+
+  // Traduce los errores de validación del dominio
+  function savedMessage(cause: unknown, fallbackKey: string): string {
+    const code = savedErrorCode(cause)
+
+    return code
+      ? i18n.global.t(`saved.errors.${code}`, { count: SWATCH_COUNT })
+      : i18n.global.t(fallbackKey)
+  }
 
   // Sin sesión no se muestran paletas ni se conserva estado
   function clearForGuest(): void {
@@ -51,7 +62,7 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
     try {
       palettes.value = await repository.value.list()
     } catch {
-      error.value = 'No pudimos cargar tus paletas guardadas.'
+      error.value = i18n.global.t('saved.loadError')
     } finally {
       loading.value = false
     }
@@ -68,21 +79,12 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
     error.value = null
 
     try {
-      const locales = await localSavedPaletteRepository.list()
-      const cloud = await repository.value.list()
-      const cloudById = new Map(cloud.map((palette) => [palette.id, palette]))
-
-      for (const local of locales) {
-        const existing = cloudById.get(local.id)
-
-        if (!existing || local.updatedAt > existing.updatedAt) {
-          await repository.value.save(local)
-        }
-      }
-
-      palettes.value = await repository.value.list()
+      palettes.value = await syncSavedPalettes({
+        local: getContainer().localSavedPalettes,
+        remote: repository.value,
+      })
     } catch {
-      error.value = 'No pudimos sincronizar tus paletas con la nube.'
+      error.value = i18n.global.t('saved.syncError')
     } finally {
       loading.value = false
     }
@@ -102,24 +104,23 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
       return true
     }
 
-    error.value = 'Necesitás iniciar sesión para guardar paletas.'
+    error.value = i18n.global.t('saved.sessionRequired')
     return false
   }
 
   async function create(input: SavedPaletteInput): Promise<SavedPalette> {
     if (!requireSession()) {
-      throw new Error('Necesitás iniciar sesión para guardar paletas.')
+      throw new Error(i18n.global.t('saved.sessionRequired'))
     }
 
     error.value = null
 
     try {
-      const palette = createSavedPalette(input)
-      await repository.value.save(palette)
-      palettes.value = await repository.value.list()
-      return palette
+      const result = await createPalette(repository.value, input)
+      palettes.value = result.palettes
+      return result.palette
     } catch (cause) {
-      error.value = cause instanceof Error ? cause.message : 'No pudimos guardar la paleta.'
+      error.value = savedMessage(cause, 'saved.saveError')
       throw cause
     }
   }
@@ -134,16 +135,14 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
     const palette = palettes.value.find((item) => item.id === id)
 
     if (!palette) {
-      error.value = 'La paleta no existe.'
+      error.value = i18n.global.t('saved.notFound')
       return
     }
 
     try {
-      const updated = renameSavedPalette(palette, name)
-      await repository.value.save(updated)
-      palettes.value = await repository.value.list()
+      palettes.value = await renamePalette(repository.value, palette, name)
     } catch (cause) {
-      error.value = cause instanceof Error ? cause.message : 'No pudimos renombrar la paleta.'
+      error.value = savedMessage(cause, 'saved.renameError')
     }
   }
 
@@ -157,15 +156,14 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
     const palette = palettes.value.find((item) => item.id === id)
 
     if (!palette) {
-      error.value = 'La paleta no existe.'
+      error.value = i18n.global.t('saved.notFound')
       return
     }
 
     try {
-      await repository.value.save(duplicateSavedPalette(palette))
-      palettes.value = await repository.value.list()
+      palettes.value = await duplicatePalette(repository.value, palette)
     } catch {
-      error.value = 'No pudimos duplicar la paleta.'
+      error.value = i18n.global.t('saved.duplicateError')
     }
   }
 
@@ -177,10 +175,9 @@ export const useSavedPalettesStore = defineStore('saved-palettes', () => {
     error.value = null
 
     try {
-      await repository.value.delete(id)
-      palettes.value = await repository.value.list()
+      palettes.value = await removePalette(repository.value, id)
     } catch {
-      error.value = 'No pudimos eliminar la paleta.'
+      error.value = i18n.global.t('saved.deleteError')
     }
   }
 

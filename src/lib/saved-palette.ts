@@ -90,6 +90,45 @@ export function isSavedPalette(value: unknown): value is SavedPalette {
   return normalized[BASE_INDEX] === value.base
 }
 
+// Códigos estables para traducir los errores en la UI
+export type SavedPaletteErrorCode =
+  | 'nameLength'
+  | 'invalidHex'
+  | 'invalidMode'
+  | 'count'
+  | 'duplicates'
+  | 'baseNotAnchored'
+
+const ERROR_CODES: SavedPaletteErrorCode[] = [
+  'nameLength',
+  'invalidHex',
+  'invalidMode',
+  'count',
+  'duplicates',
+  'baseNotAnchored',
+]
+
+// Adjunta el código sin cambiar el mensaje que consumen los tests
+function paletteError(code: SavedPaletteErrorCode, message: string): Error {
+  const error = new Error(message)
+  ;(error as Error & { code: SavedPaletteErrorCode }).code = code
+
+  return error
+}
+
+// Devuelve el código de un error de validación, si lo tiene
+export function savedErrorCode(error: unknown): SavedPaletteErrorCode | null {
+  if (!(error instanceof Error)) {
+    return null
+  }
+
+  const code = (error as Error & { code?: string }).code
+
+  return code && ERROR_CODES.includes(code as SavedPaletteErrorCode)
+    ? (code as SavedPaletteErrorCode)
+    : null
+}
+
 // Crea una paleta válida a partir de los datos del formulario
 export function createSavedPalette(input: SavedPaletteInput): SavedPalette {
   const now = new Date().toISOString()
@@ -99,29 +138,29 @@ export function createSavedPalette(input: SavedPaletteInput): SavedPalette {
   const base = normalizeHex(input.base)
 
   if (!name || name.length > 80) {
-    throw new Error('El nombre debe tener entre 1 y 80 caracteres.')
+    throw paletteError('nameLength', 'El nombre debe tener entre 1 y 80 caracteres.')
   }
 
   if (!sourceBase || !base || swatches.some((hex) => hex === null)) {
-    throw new Error('La paleta contiene un HEX inválido.')
+    throw paletteError('invalidHex', 'La paleta contiene un HEX inválido.')
   }
 
   if (!isHarmonyMode(input.mode) || !isPaletteTone(input.tone)) {
-    throw new Error('La armonía o el tono son inválidos.')
+    throw paletteError('invalidMode', 'La armonía o el tono son inválidos.')
   }
 
   if (swatches.length !== SWATCH_COUNT) {
-    throw new Error(`La paleta debe tener ${SWATCH_COUNT} colores.`)
+    throw paletteError('count', `La paleta debe tener ${SWATCH_COUNT} colores.`)
   }
 
   const normalizedSwatches = swatches as Hex[]
 
   if (new Set(normalizedSwatches).size !== SWATCH_COUNT) {
-    throw new Error('La paleta contiene colores repetidos.')
+    throw paletteError('duplicates', 'La paleta contiene colores repetidos.')
   }
 
   if (normalizedSwatches[BASE_INDEX] !== base) {
-    throw new Error('El color base no está anclado en la paleta.')
+    throw paletteError('baseNotAnchored', 'El color base no está anclado en la paleta.')
   }
 
   return {
@@ -142,7 +181,7 @@ export function renameSavedPalette(palette: SavedPalette, name: string): SavedPa
   const nextName = name.trim()
 
   if (!nextName || nextName.length > 80) {
-    throw new Error('El nombre debe tener entre 1 y 80 caracteres.')
+    throw paletteError('nameLength', 'El nombre debe tener entre 1 y 80 caracteres.')
   }
 
   return {

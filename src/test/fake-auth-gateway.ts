@@ -1,14 +1,14 @@
 // Doble de AuthGateway para tests
 
-import type { Session, User } from '@supabase/supabase-js'
+import type { Sesion, Usuario } from '@/lib/auth'
 import type { AuthGateway, SignUpOptions } from '@/ports/auth-gateway'
 
-export function fakeUser(email = 'iva@example.com'): User {
-  return { id: 'user-1', email } as User
+export function fakeUser(email = 'iva@example.com'): Usuario {
+  return { id: 'user-1', email }
 }
 
-export function fakeSession(email = 'iva@example.com'): Session {
-  return { user: fakeUser(email), access_token: 'token' } as Session
+export function fakeSession(email = 'iva@example.com'): Sesion {
+  return { user: fakeUser(email), accessToken: 'token' }
 }
 
 export interface FakeCall {
@@ -20,8 +20,8 @@ export interface FakeCall {
 }
 
 export class FakeAuthGateway implements AuthGateway {
-  session: Session | null = null
-  listener: ((session: Session | null) => void) | null = null
+  session: Sesion | null = null
+  listener: ((session: Sesion | null) => void) | null = null
   keepUnconfirmed = false
   failSignIn: unknown = null
   failSignUp: unknown = null
@@ -37,11 +37,11 @@ export class FakeAuthGateway implements AuthGateway {
   googleCalls: string[] = []
   passwordUpdates: string[] = []
 
-  async getSession(): Promise<Session | null> {
+  async getSession(): Promise<Sesion | null> {
     return this.session
   }
 
-  onChange(callback: (session: Session | null) => void): () => void {
+  onChange(callback: (session: Sesion | null) => void): () => void {
     this.listener = callback
 
     return () => {
@@ -49,7 +49,7 @@ export class FakeAuthGateway implements AuthGateway {
     }
   }
 
-  async signIn(email: string, password: string, captchaToken?: string): Promise<User> {
+  async signIn(email: string, password: string, captchaToken?: string): Promise<Usuario> {
     this.signInCalls.push({ email, password, captchaToken })
 
     if (this.failSignIn) {
@@ -62,7 +62,7 @@ export class FakeAuthGateway implements AuthGateway {
     return this.session.user
   }
 
-  async signUp(email: string, password: string, options?: SignUpOptions): Promise<User | null> {
+  async signUp(email: string, password: string, options?: SignUpOptions): Promise<Usuario | null> {
     this.signUpCalls.push({ email, password, options })
 
     if (this.failSignUp) {

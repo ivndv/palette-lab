@@ -25,6 +25,7 @@ const gateway = new SupabaseAuthGateway()
 
 const user = { id: 'user-1', email: 'iva@example.com' }
 const session = { access_token: 'token', user }
+const domainSession = { user, accessToken: 'token' }
 
 beforeEach(() => {
   for (const fn of Object.values(mocks.auth)) {
@@ -45,12 +46,12 @@ describe('SupabaseAuthGateway', () => {
       },
     )
 
-    expect(await gateway.getSession()).toBe(session)
+    expect(await gateway.getSession()).toEqual(domainSession)
 
     const onChange = vi.fn()
     const stop = gateway.onChange(onChange)
 
-    expect(onChange).toHaveBeenCalledWith(session)
+    expect(onChange).toHaveBeenCalledWith(domainSession)
 
     stop()
 
@@ -72,7 +73,7 @@ describe('SupabaseAuthGateway', () => {
       error: null,
     })
 
-    await expect(gateway.signIn('iva@example.com', 'secret123', 'captcha-token')).resolves.toBe(
+    await expect(gateway.signIn('iva@example.com', 'secret123', 'captcha-token')).resolves.toEqual(
       user,
     )
 
@@ -100,7 +101,7 @@ describe('SupabaseAuthGateway', () => {
         captchaToken: 'captcha-token',
         emailRedirectTo: 'http://localhost/confirmar',
       }),
-    ).resolves.toBe(user)
+    ).resolves.toEqual(user)
 
     expect(mocks.auth.signUp).toHaveBeenCalledWith({
       email: 'iva@example.com',

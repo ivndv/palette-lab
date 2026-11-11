@@ -1,7 +1,7 @@
 // Pruebas de persistencia y migración del estado
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createPaletteState } from './palette'
+import { createPaletteState } from '@/lib/palette'
 import {
   isLegacyPaletteState,
   isLegacyPaletteStateV2,
@@ -9,7 +9,7 @@ import {
   loadPaletteState,
   PALETTE_STORAGE_KEY,
   savePaletteState,
-} from './storage'
+} from './local-palette-storage'
 
 beforeEach(() => {
   localStorage.clear()
