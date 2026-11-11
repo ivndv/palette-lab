@@ -5,18 +5,23 @@
 import { storeToRefs } from 'pinia'
 // Vue
 import { onMounted, ref, watch } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink, useRouter } from 'vue-router'
 // Componentes
 import AppButton from '@/components/ui/AppButton.vue'
+// i18n
+import { getLocale } from '@/i18n'
 // Dominio
-import { HARMONY_MODES, type HarmonyMode, PALETTE_TONES, type PaletteTone } from '@/lib/palette'
+import type { HarmonyMode, PaletteTone } from '@/lib/palette'
 import type { SavedPalette } from '@/lib/saved-palette'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 import { usePaletteStore } from '@/stores/palette'
 import { useSavedPalettesStore } from '@/stores/saved-palettes'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const savedStore = useSavedPalettesStore()
 const paletteStore = usePaletteStore()
@@ -49,15 +54,15 @@ watch(
 )
 
 function modeLabel(mode: HarmonyMode): string {
-  return HARMONY_MODES.find((item) => item.id === mode)?.label ?? mode
+  return t(`modes.${mode}.label`)
 }
 
 function toneLabel(tone: PaletteTone): string {
-  return PALETTE_TONES.find((item) => item.id === tone)?.label ?? tone
+  return t(`tones.${tone}.label`)
 }
 
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('es', { dateStyle: 'medium' }).format(new Date(value))
+  return new Intl.DateTimeFormat(getLocale(), { dateStyle: 'medium' }).format(new Date(value))
 }
 
 // Abrir restaura la paleta y entra al historial del generador
@@ -99,7 +104,7 @@ async function duplicatePalette(id: string): Promise<void> {
 }
 
 async function removePalette(palette: SavedPalette): Promise<void> {
-  const confirmed = window.confirm(`¿Eliminar “${palette.name}”?`)
+  const confirmed = window.confirm(t('saved.confirmDelete', { name: palette.name }))
 
   if (!confirmed) {
     return
@@ -117,14 +122,16 @@ async function removePalette(palette: SavedPalette): Promise<void> {
 <template>
   <div class="saved-palettes">
     <header class="page-heading">
-      <p class="page-heading__eyebrow">Mis paletas</p>
-      <h1>Tus combinaciones guardadas.</h1>
-      <p>Abre una paleta para seguir editándola, renómbrala, duplícala o elimínala.</p>
+      <p class="page-heading__eyebrow">{{ t('saved.eyebrow') }}</p>
+      <h1>{{ t('saved.title') }}</h1>
+      <p>{{ t('saved.lead') }}</p>
     </header>
 
-    <p class="saved-palettes__storage">Guardadas en tu cuenta · {{ auth.userEmail }}</p>
+    <p class="saved-palettes__storage">
+      {{ t('saved.storage') }} · {{ auth.userEmail }}
+    </p>
 
-    <p v-if="loading" class="saved-palettes__state">Cargando paletas…</p>
+    <p v-if="loading" class="saved-palettes__state">{{ t('saved.loading') }}</p>
 
     <p v-else-if="error" class="saved-palettes__error" role="alert">
       {{ error }}
@@ -140,12 +147,12 @@ async function removePalette(palette: SavedPalette): Promise<void> {
       class="saved-palettes__empty"
       aria-labelledby="empty-title"
     >
-      <h2 id="empty-title">Todavía no guardaste ninguna paleta.</h2>
-      <p>Generá una paleta y guardala debajo de la sección de exportar.</p>
-      <RouterLink class="saved-palettes__cta" to="/generador">Ir al generador</RouterLink>
+      <h2 id="empty-title">{{ t('saved.emptyTitle') }}</h2>
+      <p>{{ t('saved.emptyBody') }}</p>
+      <RouterLink class="saved-palettes__cta" to="/generador">{{ t('saved.cta') }}</RouterLink>
     </section>
 
-    <section v-else class="saved-palettes__grid" aria-label="Paletas guardadas">
+    <section v-else class="saved-palettes__grid" :aria-label="t('saved.gridAria')">
       <article v-for="palette in palettes" :key="palette.id" class="saved-card">
         <!-- La vista previa es decorativa: el texto la reemplaza -->
         <div class="saved-card__preview" aria-hidden="true">
@@ -159,7 +166,7 @@ async function removePalette(palette: SavedPalette): Promise<void> {
 
         <div class="saved-card__body">
           <div v-if="editingId === palette.id" class="saved-card__rename">
-            <label class="sr-only" :for="`rename-${palette.id}`">Nuevo nombre</label>
+            <label class="sr-only" :for="`rename-${palette.id}`">{{ t('saved.newName') }}</label>
             <input
               :id="`rename-${palette.id}`"
               v-model="editingName"
@@ -171,10 +178,10 @@ async function removePalette(palette: SavedPalette): Promise<void> {
             />
             <div class="saved-card__rename-actions">
               <AppButton type="button" variant="primary" @click="commitRename">
-                Guardar
+                {{ t('common.save') }}
               </AppButton>
               <AppButton type="button" variant="ghost" @click="cancelRename">
-                Cancelar
+                {{ t('common.cancel') }}
               </AppButton>
             </div>
           </div>
@@ -188,12 +195,18 @@ async function removePalette(palette: SavedPalette): Promise<void> {
           </template>
 
           <div class="saved-card__actions">
-            <AppButton variant="primary" @click="openPalette(palette)">Abrir</AppButton>
-            <AppButton variant="ghost" @click="startRename(palette)">Renombrar</AppButton>
-            <AppButton variant="ghost" @click="duplicatePalette(palette.id)">
-              Duplicar
+            <AppButton variant="primary" @click="openPalette(palette)">
+              {{ t('common.open') }}
             </AppButton>
-            <AppButton variant="ghost" @click="removePalette(palette)">Eliminar</AppButton>
+            <AppButton variant="ghost" @click="startRename(palette)">
+              {{ t('common.rename') }}
+            </AppButton>
+            <AppButton variant="ghost" @click="duplicatePalette(palette.id)">
+              {{ t('common.duplicate') }}
+            </AppButton>
+            <AppButton variant="ghost" @click="removePalette(palette)">
+              {{ t('common.delete') }}
+            </AppButton>
           </div>
         </div>
       </article>

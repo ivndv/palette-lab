@@ -5,6 +5,8 @@
 import { LoaderCircle, Palette, TriangleAlert } from '@lucide/vue'
 // Vue
 import { onMounted, ref } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink, useRouter } from 'vue-router'
 // Componentes
@@ -12,6 +14,7 @@ import AuthLayout from '@/components/auth/AuthLayout.vue'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const router = useRouter()
 
@@ -34,27 +37,27 @@ onMounted(async () => {
   <AuthLayout
     v-if="failed"
     :icon="TriangleAlert"
-    title="No pudimos confirmar la cuenta"
-    subtitle="El enlace expiró o ya se usó. Podés pedir uno nuevo desde el ingreso."
+    :title="t('auth.confirm.failedTitle')"
+    :subtitle="t('auth.confirm.failedSubtitle')"
   >
     <RouterLink class="auth-button auth-button--primary" to="/login">
-      Volver a entrar
+      {{ t('auth.confirm.back') }}
     </RouterLink>
 
     <template #footer>
-      Si ya confirmaste antes, entrá con tu email y contraseña.
+      {{ t('auth.confirm.failedFooter') }}
     </template>
   </AuthLayout>
 
   <AuthLayout
     v-else
     :icon="Palette"
-    title="Confirmando tu cuenta"
-    subtitle="Estamos validando el enlace."
+    :title="t('auth.confirm.loadingTitle')"
+    :subtitle="t('auth.confirm.loadingSubtitle')"
   >
     <p class="auth-loading" role="status">
       <LoaderCircle :size="18" class="auth-spin" aria-hidden="true" />
-      Un momento…
+      {{ t('auth.confirm.loading') }}
     </p>
   </AuthLayout>
 </template>

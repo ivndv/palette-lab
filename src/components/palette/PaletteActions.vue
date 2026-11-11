@@ -2,7 +2,10 @@
 // Barra de acciones: deshacer, rehacer, desbloquear y regenerar
 
 import { LockOpen, Redo2, RefreshCw, Undo2 } from '@lucide/vue'
+import { useI18n } from 'vue-i18n'
 import AppButton from '@/components/ui/AppButton.vue'
+
+const { t } = useI18n()
 
 defineProps<{
   canRegenerate: boolean
@@ -25,44 +28,46 @@ const emit = defineEmits<{
       <AppButton
         variant="secondary"
         :disabled="!canUndo"
-        title="Deshacer el último cambio"
+        :title="t('actions.undoTitle')"
         @click="emit('undo')"
       >
         <Undo2 :size="16" aria-hidden="true" />
-        Deshacer
+        {{ t('actions.undo') }}
       </AppButton>
 
       <AppButton
         variant="secondary"
         :disabled="!canRedo"
-        title="Rehacer el último cambio"
+        :title="t('actions.redoTitle')"
         @click="emit('redo')"
       >
         <Redo2 :size="16" aria-hidden="true" />
-        Rehacer
+        {{ t('actions.redo') }}
       </AppButton>
 
       <AppButton
         v-if="lockedCount > 0"
         variant="ghost"
-        title="Desbloquear todos los colores generados"
+        :title="t('actions.unlockAllTitle')"
         @click="emit('unlock-all')"
       >
         <LockOpen :size="16" aria-hidden="true" />
-        Desbloquear todo
+        {{ t('actions.unlockAll') }}
       </AppButton>
 
       <AppButton
         variant="primary"
         :disabled="!canRegenerate"
-        :title="canRegenerate ? 'Generar otra paleta' : 'Todos los colores están bloqueados'"
+        :title="canRegenerate ? t('actions.regenerateTitle') : t('actions.allLocked')"
         @click="emit('regenerate')"
       >
         <RefreshCw :size="16" aria-hidden="true" />
-        Regenerar
+        {{ t('actions.regenerate') }}
       </AppButton>
     </div>
 
-    <span class="palette-actions__hint">{{ lockedCount }} bloqueados</span>
+    <span class="palette-actions__hint">
+      {{ t('actions.lockedCount', { count: lockedCount }) }}
+    </span>
   </div>
 </template>

@@ -3,8 +3,11 @@
 
 import { Check, ClipboardCopy, Download, ExternalLink } from '@lucide/vue'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppButton from '@/components/ui/AppButton.vue'
 import type { ExportFormat } from '@/lib/export'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   formats: ExportFormat[]
@@ -28,13 +31,13 @@ const copied = computed(() => selected.value?.id === props.copiedId)
   <section class="export-panel" aria-labelledby="export-title">
     <div class="export-panel__header">
       <div class="export-panel__copy">
-        <p class="export-panel__eyebrow">04 · Exporta</p>
-        <h2 id="export-title">Exportar</h2>
-        <p>Lleva la paleta a tu proyecto en el formato que necesites.</p>
+        <p class="export-panel__eyebrow">{{ t('export.eyebrow') }}</p>
+        <h2 id="export-title">{{ t('export.title') }}</h2>
+        <p>{{ t('export.lead') }}</p>
       </div>
 
       <!-- Grupo de botones: aria-pressed refleja el formato activo -->
-      <div class="export-panel__tabs" role="group" aria-label="Formato de exportación">
+      <div class="export-panel__tabs" role="group" :aria-label="t('export.tabsAria')">
         <button
           v-for="format in formats"
           :key="format.id"
@@ -55,13 +58,13 @@ const copied = computed(() => selected.value?.id === props.copiedId)
         <AppButton variant="secondary" @click="emit('copy', selected)">
           <Check v-if="copied" :size="16" aria-hidden="true" />
           <ClipboardCopy v-else :size="16" aria-hidden="true" />
-          {{ copied ? 'Copiado' : 'Copiar' }}
+          {{ copied ? t('common.copied') : t('common.copy') }}
         </AppButton>
 
         <!-- La URL se abre; los archivos se descargan -->
         <AppButton v-if="selected.filename" variant="ghost" @click="emit('download', selected)">
           <Download :size="16" aria-hidden="true" />
-          Descargar
+          {{ t('common.download') }}
         </AppButton>
 
         <a
@@ -72,7 +75,7 @@ const copied = computed(() => selected.value?.id === props.copiedId)
           rel="noreferrer"
         >
           <ExternalLink :size="16" aria-hidden="true" />
-          Abrir URL
+          {{ t('export.openUrl') }}
         </a>
       </div>
     </div>

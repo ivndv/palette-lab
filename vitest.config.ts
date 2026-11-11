@@ -12,6 +12,7 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
+    setupFiles: ['src/test/setup.ts'],
     // Misma site key que en local: los tests de auth dependen del captcha activo
     env: {
       VITE_TURNSTILE_SITE_KEY: '1x00000000000000000000AA',
@@ -20,8 +21,13 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/lib/**/*.ts', 'src/composables/**/*.ts'],
-      exclude: ['src/**/*.spec.ts'],
+      include: [
+        'src/lib/**/*.ts',
+        'src/application/**/*.ts',
+        'src/adapters/**/*.ts',
+        'src/composables/**/*.ts',
+      ],
+      exclude: ['src/**/*.spec.ts', 'src/adapters/supabase/client.ts'],
       thresholds: {
         statements: 95,
         branches: 90,

@@ -3,8 +3,11 @@
 
 import { Check, Copy, Lock, LockOpen } from '@lucide/vue'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { bestTextColor, contrastRatio, type Hex, hexToHsl, wcagLevel } from '@/lib/color'
 import type { Swatch } from '@/lib/palette'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   swatch: Swatch
@@ -26,9 +29,13 @@ const hsl = computed(() => hexToHsl(props.swatch.hex))
 const isLocked = computed(() => props.base || props.swatch.locked)
 
 // Etiquetas accesibles que no dependen del color
-const roleLabel = computed(() => (props.base ? 'Color base' : `Color ${props.index + 1}`))
+const roleLabel = computed(() =>
+  props.base ? t('cards.baseRole') : t('cards.colorRole', { n: props.index + 1 }),
+)
 const lockLabel = computed(() =>
-  props.swatch.locked ? `Desbloquear ${props.swatch.hex}` : `Bloquear ${props.swatch.hex}`,
+  props.swatch.locked
+    ? t('cards.unlock', { hex: props.swatch.hex })
+    : t('cards.lock', { hex: props.swatch.hex }),
 )
 </script>
 
@@ -40,7 +47,7 @@ const lockLabel = computed(() =>
   >
     <div class="color-card__top">
       <span class="color-card__role">{{ roleLabel }}</span>
-      <span v-if="base" class="color-card__base-badge">Base</span>
+      <span v-if="base" class="color-card__base-badge">{{ t('cards.base') }}</span>
     </div>
 
     <strong class="color-card__hex">{{ swatch.hex }}</strong>
@@ -54,10 +61,10 @@ const lockLabel = computed(() =>
       <span
         v-if="base"
         class="color-card__action color-card__action--static"
-        aria-label="Color base anclado"
+        :aria-label="t('cards.baseLocked')"
       >
         <Lock :size="15" aria-hidden="true" />
-        <span>Base</span>
+        <span>{{ t('cards.base') }}</span>
       </span>
 
       <button
@@ -70,18 +77,18 @@ const lockLabel = computed(() =>
       >
         <Lock v-if="isLocked" :size="15" aria-hidden="true" />
         <LockOpen v-else :size="15" aria-hidden="true" />
-        <span>{{ isLocked ? 'Bloqueado' : 'Libre' }}</span>
+        <span>{{ isLocked ? t('cards.locked') : t('cards.free') }}</span>
       </button>
 
       <button
         type="button"
         class="color-card__action"
-        :aria-label="`Copiar ${swatch.hex}`"
+        :aria-label="t('cards.copyAria', { hex: swatch.hex })"
         @click="emit('copy', swatch.hex)"
       >
         <Check v-if="copied" :size="15" aria-hidden="true" />
         <Copy v-else :size="15" aria-hidden="true" />
-        <span>{{ copied ? 'Copiado' : 'Copiar' }}</span>
+        <span>{{ copied ? t('common.copied') : t('common.copy') }}</span>
       </button>
     </div>
   </article>

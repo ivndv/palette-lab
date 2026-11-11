@@ -3,9 +3,11 @@
 
 import { Sparkles } from '@lucide/vue'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AppButton from '@/components/ui/AppButton.vue'
 import type { InterpretedPalette } from '@/lib/ai'
-import { HARMONY_MODES, PALETTE_TONES } from '@/lib/palette'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   loading: boolean
@@ -23,12 +25,8 @@ const prompt = ref('')
 const inputRef = ref<HTMLInputElement | null>(null)
 
 // Etiquetas legibles de la receta aplicada
-const modeLabel = computed(
-  () => HARMONY_MODES.find((mode) => mode.id === props.result?.mode)?.label ?? '',
-)
-const toneLabel = computed(
-  () => PALETTE_TONES.find((tone) => tone.id === props.result?.tone)?.label ?? '',
-)
+const modeLabel = computed(() => (props.result ? t(`modes.${props.result.mode}.label`) : ''))
+const toneLabel = computed(() => (props.result ? t(`tones.${props.result.tone}.label`) : ''))
 
 function submit(): void {
   const value = prompt.value.trim()
@@ -50,16 +48,13 @@ function useExample(example: string): void {
 <template>
   <section class="ai-prompt" aria-labelledby="ai-prompt-title">
     <div class="ai-prompt__heading">
-      <p class="ai-prompt__eyebrow">IA</p>
-      <h2 id="ai-prompt-title">Describe tu paleta.</h2>
-      <p>
-        Escribe una idea en lenguaje natural. La IA elige el color base, la armonía y el tono;
-        los cinco colores los genera Palette Lab.
-      </p>
+      <p class="ai-prompt__eyebrow">{{ t('ai.eyebrow') }}</p>
+      <h2 id="ai-prompt-title">{{ t('ai.title') }}</h2>
+      <p>{{ t('ai.lead') }}</p>
     </div>
 
     <form class="ai-prompt__form" @submit.prevent="submit">
-      <label class="sr-only" for="ai-prompt-input">Descripción de la paleta</label>
+      <label class="sr-only" for="ai-prompt-input">{{ t('ai.inputLabel') }}</label>
       <input
         id="ai-prompt-input"
         ref="inputRef"
@@ -69,16 +64,16 @@ function useExample(example: string): void {
         maxlength="240"
         autocomplete="off"
         spellcheck="false"
-        placeholder="Ej. atardecer en la playa"
+        :placeholder="t('ai.placeholder')"
         :disabled="loading"
       />
       <AppButton type="submit" variant="primary" :disabled="loading || !prompt.trim()">
         <Sparkles :size="16" aria-hidden="true" />
-        {{ loading ? 'Interpretando…' : 'Interpretar' }}
+        {{ loading ? t('ai.interpreting') : t('ai.interpret') }}
       </AppButton>
     </form>
 
-    <div class="ai-prompt__examples" aria-label="Ejemplos de descripciones">
+    <div class="ai-prompt__examples" :aria-label="t('ai.examplesAria')">
       <button
         v-for="example in examples"
         :key="example"
@@ -93,14 +88,11 @@ function useExample(example: string): void {
 
     <p v-if="error" class="ai-prompt__error" role="alert">{{ error }}</p>
     <p v-else-if="result" class="ai-prompt__result" aria-live="polite">
-      <span>{{ result.label ?? 'Interpretación lista' }}</span>
+      <span>{{ result.label ?? t('ai.resultReady') }}</span>
       <code>{{ result.base }}</code>
       <span>{{ modeLabel }} · {{ toneLabel }}</span>
-      <span v-if="lockedCount > 0">Se conservaron {{ lockedCount }} bloqueados.</span>
+      <span v-if="lockedCount > 0">{{ t('ai.keptLocked', { count: lockedCount }) }}</span>
     </p>
-    <p v-else class="ai-prompt__hint">
-      Elige un ejemplo o escribe tu idea y presiona Interpretar. La IA solo traduce la
-      descripción a una receta válida.
-    </p>
+    <p v-else class="ai-prompt__hint">{{ t('ai.hint') }}</p>
   </section>
 </template>

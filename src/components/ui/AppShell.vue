@@ -1,6 +1,14 @@
+<script setup lang="ts">
+// Estructura base: skip link, header, main y footer
+
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+</script>
+
 <template>
   <!-- Salto de accesibilidad -->
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <a class="skip-link" href="#contenido">{{ t('shell.skip') }}</a>
 
   <div class="app-shell">
     <header class="app-shell__header">

@@ -5,6 +5,8 @@
 import { Dices, RefreshCw, Undo2 } from '@lucide/vue'
 // Vue
 import { computed, ref, watch } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Componentes
 import AppButton from '@/components/ui/AppButton.vue'
 // Dominio
@@ -17,6 +19,8 @@ import {
   type PaletteTone,
 } from '@/lib/palette'
 import type { Preset } from '@/lib/presets'
+
+const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
@@ -50,15 +54,9 @@ const emit = defineEmits<{
 const hexInput = ref<string>(props.base)
 const hexError = ref<string | null>(null)
 
-const modeDescription = computed(
-  () => HARMONY_MODES.find((option) => option.id === props.mode)?.description ?? '',
-)
-const toneDescription = computed(
-  () => PALETTE_TONES.find((option) => option.id === props.tone)?.description ?? '',
-)
-const toneLabel = computed(
-  () => PALETTE_TONES.find((option) => option.id === props.tone)?.label ?? '',
-)
+const modeDescription = computed(() => t(`modes.${props.mode}.description`))
+const toneDescription = computed(() => t(`tones.${props.tone}.description`))
+const toneLabel = computed(() => t(`tones.${props.tone}.label`))
 
 // Mantiene el input sincronizado con cambios externos
 watch(
@@ -73,7 +71,7 @@ function commitHex(): void {
   const normalized = normalizeHex(hexInput.value)
 
   if (!normalized) {
-    hexError.value = 'HEX inválido. Usa #rrggbb.'
+    hexError.value = t('toolbar.hexError')
     return
   }
 
@@ -104,17 +102,17 @@ function onToneChange(event: Event): void {
 
 <template>
   <section class="palette-toolbar" aria-labelledby="toolbar-title">
-    <h2 id="toolbar-title" class="sr-only">Controles de paleta</h2>
+    <h2 id="toolbar-title" class="sr-only">{{ t('toolbar.controls') }}</h2>
 
     <div class="palette-toolbar__field">
-      <label class="palette-toolbar__label" for="base-color">01 · Color base</label>
+      <label class="palette-toolbar__label" for="base-color">{{ t('toolbar.base') }}</label>
       <div class="palette-toolbar__base-row">
         <input
           id="base-color"
           class="palette-toolbar__picker"
           type="color"
           :value="base"
-          aria-label="Elegir color base"
+          :aria-label="t('toolbar.pickerAria')"
           @input="onColorInput"
         />
 
@@ -124,26 +122,26 @@ function onToneChange(event: Event): void {
           type="text"
           maxlength="7"
           spellcheck="false"
-          aria-label="HEX del color base"
+          :aria-label="t('toolbar.hexAria')"
           @blur="commitHex"
           @keydown.enter.prevent="commitHex"
         />
 
         <AppButton variant="ghost" @click="emit('randomize')">
           <Dices :size="16" aria-hidden="true" />
-          Aleatorio
+          {{ t('toolbar.random') }}
         </AppButton>
       </div>
 
       <!-- Avisa cuando el tono adapta el color elegido -->
       <p v-if="hexError" class="palette-toolbar__error" role="alert">{{ hexError }}</p>
       <p v-else-if="appliedBase !== base" class="palette-toolbar__adapted">
-        Tono {{ toneLabel }} → se aplica <code>{{ appliedBase }}</code>
+        {{ t('toolbar.adapted', { tone: toneLabel, hex: appliedBase }) }}
       </p>
     </div>
 
     <fieldset class="palette-toolbar__field">
-      <legend class="palette-toolbar__label">02 · Armonía</legend>
+      <legend class="palette-toolbar__label">{{ t('toolbar.harmony') }}</legend>
       <div class="palette-toolbar__modes">
         <AppButton
           v-for="option in HARMONY_MODES"
@@ -152,30 +150,30 @@ function onToneChange(event: Event): void {
           :pressed="option.id === mode"
           @click="emit('update:mode', option.id)"
         >
-          {{ option.label }}
+          {{ t(`modes.${option.id}.label`) }}
         </AppButton>
       </div>
       <p class="palette-toolbar__hint">{{ modeDescription }}</p>
     </fieldset>
 
     <div class="palette-toolbar__field">
-      <label class="palette-toolbar__label" for="palette-tone">Tono</label>
+      <label class="palette-toolbar__label" for="palette-tone">{{ t('toolbar.tone') }}</label>
       <select
         id="palette-tone"
         class="palette-toolbar__select"
         :value="tone"
-        aria-label="Tono de la paleta"
+        :aria-label="t('toolbar.toneAria')"
         @change="onToneChange"
       >
         <option v-for="option in PALETTE_TONES" :key="option.id" :value="option.id">
-          {{ option.label }}
+          {{ t(`tones.${option.id}.label`) }}
         </option>
       </select>
       <p class="palette-toolbar__hint">{{ toneDescription }}</p>
     </div>
 
     <div class="palette-toolbar__field">
-      <span class="palette-toolbar__label">Recetas</span>
+      <span class="palette-toolbar__label">{{ t('toolbar.recipes') }}</span>
       <div class="palette-toolbar__chips">
         <button
           v-for="preset in presets"
@@ -186,7 +184,7 @@ function onToneChange(event: Event): void {
           :aria-pressed="preset.id === selectedPresetId"
           @click="emit('apply-preset', preset)"
         >
-          {{ preset.name }}
+          {{ t(`presets.${preset.id}`) }}
         </button>
       </div>
     </div>
@@ -197,25 +195,25 @@ function onToneChange(event: Event): void {
         <AppButton
           variant="secondary"
           :disabled="!canUndo"
-          title="Deshacer la última regeneración"
+          :title="t('toolbar.undoTitle')"
           @click="emit('undo')"
         >
           <Undo2 :size="16" aria-hidden="true" />
-          Deshacer
+          {{ t('toolbar.undo') }}
         </AppButton>
 
         <AppButton
           variant="primary"
           :disabled="!canRegenerate"
-          :title="canRegenerate ? 'Generar otra paleta' : 'Todos los colores están bloqueados'"
+          :title="canRegenerate ? t('toolbar.regenerateTitle') : t('toolbar.allLocked')"
           @click="emit('regenerate')"
         >
           <RefreshCw :size="16" aria-hidden="true" />
-          Regenerar
+          {{ t('toolbar.regenerate') }}
         </AppButton>
       </div>
 
-      <span class="palette-toolbar__hint">{{ lockedCount }} bloqueados</span>
+      <span class="palette-toolbar__hint">{{ t('toolbar.lockedCount', { count: lockedCount }) }}</span>
     </div>
   </section>
 </template>

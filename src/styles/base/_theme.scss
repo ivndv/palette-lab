@@ -1,8 +1,19 @@
 // Variables de color para tema claro y oscuro
 
-:root {
-  color-scheme: light dark;
+@mixin dark-tokens {
+  color-scheme: dark;
+  --color-bg: #09090b;
+  --color-surface: #121216;
+  --color-text: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-border: #27272a;
+  --color-accent: #818cf8;
+  --color-accent-soft: #1e1b4b;
+  --shadow-card: 0 20px 45px -25px rgb(0 0 0 / 70%);
+}
 
+:root {
+  color-scheme: light;
   --color-bg: #f6f7fb;
   --color-surface: #ffffff;
   --color-text: #18181b;
@@ -13,15 +24,14 @@
   --shadow-card: 0 20px 45px -25px rgb(24 24 27 / 35%);
 }
 
+// Elección explícita del usuario
+:root[data-theme='dark'] {
+  @include dark-tokens;
+}
+
+// Sin elección explícita, manda el sistema
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #09090b;
-    --color-surface: #121216;
-    --color-text: #fafafa;
-    --color-muted: #a1a1aa;
-    --color-border: #27272a;
-    --color-accent: #818cf8;
-    --color-accent-soft: #1e1b4b;
-    --shadow-card: 0 20px 45px -25px rgb(0 0 0 / 70%);
+  :root:not([data-theme='light']) {
+    @include dark-tokens;
   }
 }

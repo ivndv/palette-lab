@@ -5,6 +5,8 @@
 import { KeyRound, LoaderCircle, LockKeyhole } from '@lucide/vue'
 // Vue
 import { computed, onMounted, ref } from 'vue'
+// i18n
+import { useI18n } from 'vue-i18n'
 // Router
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 // Componentes
@@ -12,6 +14,7 @@ import AuthLayout from '@/components/auth/AuthLayout.vue'
 // Stores
 import { useAuthStore } from '@/stores/auth'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
@@ -46,7 +49,7 @@ async function submit(): Promise<void> {
   }
 
   if (password.value !== confirmPassword.value) {
-    localError.value = 'Las contraseñas no coinciden.'
+    localError.value = t('auth.reset.mismatch')
     return
   }
 
@@ -61,32 +64,28 @@ async function submit(): Promise<void> {
 <template>
   <AuthLayout
     :icon="LockKeyhole"
-    :title="invalidLink ? 'Enlace inválido' : 'Nueva contraseña'"
-    :subtitle="
-      invalidLink
-        ? 'El enlace expiró o ya se usó. Pedí uno nuevo para continuar.'
-        : 'Elegí una contraseña nueva para tu cuenta.'
-    "
+    :title="invalidLink ? t('auth.reset.titleInvalid') : t('auth.reset.title')"
+    :subtitle="invalidLink ? t('auth.reset.subtitleInvalid') : t('auth.reset.subtitle')"
   >
     <p v-if="!ready" class="auth-loading" role="status">
       <LoaderCircle :size="18" class="auth-spin" aria-hidden="true" />
-      Validando el enlace…
+      {{ t('auth.reset.validating') }}
     </p>
 
     <template v-else-if="invalidLink">
       <p class="auth-alert" role="alert">
-        No pudimos validar el enlace de recuperación.
+        {{ t('auth.reset.invalid') }}
       </p>
 
       <RouterLink class="auth-button auth-button--primary" to="/recuperar">
         <KeyRound :size="16" aria-hidden="true" />
-        Pedir otro enlace
+        {{ t('auth.reset.another') }}
       </RouterLink>
     </template>
 
     <form v-else class="auth-form" @submit.prevent="submit">
       <div class="auth-field">
-        <label for="reset-password">Contraseña nueva</label>
+        <label for="reset-password">{{ t('auth.reset.password') }}</label>
         <input
           id="reset-password"
           v-model="password"
@@ -94,7 +93,7 @@ async function submit(): Promise<void> {
           autocomplete="new-password"
           minlength="6"
           required
-          placeholder="mínimo 6 caracteres"
+          :placeholder="t('auth.reset.passwordPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(errorMessage)"
           :aria-describedby="errorMessage ? 'reset-error' : undefined"
@@ -102,7 +101,7 @@ async function submit(): Promise<void> {
       </div>
 
       <div class="auth-field">
-        <label for="reset-confirm">Confirmar contraseña</label>
+        <label for="reset-confirm">{{ t('auth.reset.confirm') }}</label>
         <input
           id="reset-confirm"
           v-model="confirmPassword"
@@ -110,7 +109,7 @@ async function submit(): Promise<void> {
           autocomplete="new-password"
           minlength="6"
           required
-          placeholder="repetí tu contraseña"
+          :placeholder="t('auth.reset.confirmPlaceholder')"
           :disabled="auth.loading"
           :aria-invalid="Boolean(errorMessage)"
           :aria-describedby="errorMessage ? 'reset-error' : undefined"
@@ -133,12 +132,12 @@ async function submit(): Promise<void> {
           aria-hidden="true"
         />
         <LockKeyhole v-else :size="16" aria-hidden="true" />
-        {{ auth.loading ? 'Guardando…' : 'Guardar contraseña' }}
+        {{ auth.loading ? t('auth.reset.submitting') : t('auth.reset.submit') }}
       </button>
     </form>
 
     <p class="auth-footnote">
-      <RouterLink class="auth-link" to="/login">Volver a entrar</RouterLink>
+      <RouterLink class="auth-link" to="/login">{{ t('auth.reset.back') }}</RouterLink>
     </p>
   </AuthLayout>
 </template>

@@ -9,6 +9,19 @@
       content="Palette Lab: generador de paletas de color con contraste WCAG."
     />
     <title>Palette Lab</title>
+    <!-- Evita el flash de tema: fija data-theme antes del primer pintado -->
+    <script>
+      ;(function () {
+        try {
+          var theme = localStorage.getItem('palette-lab:theme')
+          if (theme === 'light' || theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', theme)
+          }
+        } catch (error) {
+          /* localStorage puede estar bloqueado */
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

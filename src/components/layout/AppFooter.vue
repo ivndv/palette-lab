@@ -1,24 +1,28 @@
 <script setup lang="ts">
 // Footer con navegación, proyecto y stack
 
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
+
+const { t } = useI18n()
 
 const anio = new Date().getFullYear()
 
-const navegacion = [
-  { to: '/', label: 'Inicio' },
-  { to: '/generador', label: 'Generador' },
-  { to: '/mis-paletas', label: 'Mis paletas' },
-]
+const navegacion = computed(() => [
+  { to: '/', label: t('footer.home') },
+  { to: '/generador', label: t('footer.generator') },
+  { to: '/mis-paletas', label: t('footer.saved') },
+])
 
-const proyecto = [
-  { href: 'https://github.com/ivndv', label: 'GitHub' },
-  { href: 'https://github.com/ivndv/palette-lab', label: 'Repositorio' },
+const proyecto = computed(() => [
+  { href: 'https://github.com/ivndv', label: t('footer.github') },
+  { href: 'https://github.com/ivndv/palette-lab', label: t('footer.repository') },
   {
     href: 'https://github.com/ivndv/palette-lab#readme',
-    label: 'Documentación',
+    label: t('footer.documentation'),
   },
-]
+])
 
 const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
 </script>
@@ -27,7 +31,7 @@ const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
   <div class="site-footer">
     <div class="site-footer__grid">
       <div class="site-footer__identity">
-        <RouterLink class="brand" to="/" aria-label="Palette Lab, inicio">
+        <RouterLink class="brand" to="/" :aria-label="t('header.brandAria')">
           <img
             class="brand__icon brand__icon--small"
             src="/favicon.svg"
@@ -38,14 +42,14 @@ const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
           <span class="brand__name">palette lab</span>
         </RouterLink>
 
-        <p>Genera, bloquea y exporta paletas de color sin fricción.</p>
+        <p>{{ t('footer.description') }}</p>
 
         <a
           class="site-footer__icon"
           href="https://github.com/ivndv"
           target="_blank"
           rel="noreferrer"
-          aria-label="GitHub de Ivan Cruz"
+          :aria-label="t('footer.githubAria')"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path
@@ -57,7 +61,7 @@ const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
 
       <!-- Landmark de navegación con título accesible -->
       <nav class="site-footer__column" aria-labelledby="footer-navigation-title">
-        <h3 id="footer-navigation-title">Navegación</h3>
+        <h3 id="footer-navigation-title">{{ t('footer.navigation') }}</h3>
         <ul>
           <li v-for="enlace in navegacion" :key="enlace.to">
             <RouterLink :to="enlace.to">{{ enlace.label }}</RouterLink>
@@ -66,7 +70,7 @@ const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
       </nav>
 
       <div class="site-footer__column">
-        <h3>Proyecto</h3>
+        <h3>{{ t('footer.project') }}</h3>
         <ul>
           <li v-for="enlace in proyecto" :key="enlace.href">
             <a :href="enlace.href" target="_blank" rel="noreferrer">
@@ -78,7 +82,7 @@ const tecnologias = ['Vue 3', 'TypeScript', 'Sass', 'Vite']
     </div>
 
     <div class="site-footer__bottom">
-      <p>© {{ anio }} Palette Lab · Desarrollado por <span>Ivan Cruz</span></p>
+      <p>© {{ anio }} Palette Lab · {{ t('footer.builtBy') }} <span>Ivan Cruz</span></p>
 
       <div class="site-footer__tech">
         <span v-for="tech in tecnologias" :key="tech">{{ tech }}</span>
